@@ -1,0 +1,4 @@
+
+
+
+protoc --proto_path=./proto --go_out=paths=source_relative:./pb --go-grpc_out=paths=source_relative:./pb service/service.proto
