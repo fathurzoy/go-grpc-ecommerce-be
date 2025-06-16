@@ -24,6 +24,7 @@ type IAuthService interface {
 	Register(ctx context.Context, request *auth.RegisterRequest) (*auth.RegisterResponse, error)
 	Login(ctx context.Context, request *auth.LoginRequest) (*auth.LoginResponse, error)
 	Logout(ctx context.Context, request *auth.LogoutRequest) (*auth.LogoutResponse, error)
+	ChangePassword(ctx context.Context, request *auth.ChangePasswordRequest) (*auth.ChangePasswordResponse, error)
 }
 
 type authService struct {
@@ -141,6 +142,60 @@ func (as *authService) Logout(ctx context.Context, request *auth.LogoutRequest) 
 	// kirim response
 	return &auth.LogoutResponse{
 		Base: utils.SuccessResponse("Logout success"),
+	}, nil
+}
+
+func (as *authService) ChangePassword(ctx context.Context, request *auth.ChangePasswordRequest) (*auth.ChangePasswordResponse, error) {
+	//cek apakah new pass confirmation mached
+	if request.NewPassword != request.NewPasswordConfirmation {
+		return &auth.ChangePasswordResponse{
+			Base: utils.BadRequestResponse("New password and new password confirmation does not match"),
+		}, nil
+	}
+
+	//cek apakah old password sama
+	jwtToken, err := jwtentity.ParseTokenFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	claims, err := jwtentity.GetClaimsFromToken(jwtToken)
+	if err != nil {
+		return nil, err
+	}
+
+	user, err := as.authRepository.GetUserByEmail(ctx, claims.Email)
+	if err != nil {
+		return nil, err
+	}
+
+	if user == nil {
+		return &auth.ChangePasswordResponse{
+			Base: utils.BadRequestResponse("User not found"),
+		}, nil
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(request.OldPassword))
+	if err != nil {
+		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
+			return nil, status.Errorf(codes.Unauthenticated, "invalid old password")
+		}
+		return nil, err
+	}
+
+	//update new password ke database
+	hashedNewPassword, err := bcrypt.GenerateFromPassword([]byte(request.NewPassword), 10)
+	if err != nil {
+		return nil, err
+	}
+	err = as.authRepository.UpdateUserPassword(ctx, user.Id, string(hashedNewPassword), claims.FullName)
+	if err != nil {
+		return nil, err
+	}
+
+	//kirim response
+
+	return &auth.ChangePasswordResponse{
+		Base: utils.SuccessResponse("Change password success"),
 	}, nil
 }
 
