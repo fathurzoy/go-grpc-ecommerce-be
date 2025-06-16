@@ -6,12 +6,14 @@ option go_package = "github.com/fathurzoy/go-grpc-ecommerce-be/pb/auth";
 
 import "common/base_response.proto";
 import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
 
 service AuthService {
   rpc Register(RegisterRequest) returns (RegisterResponse);
   rpc Login(LoginRequest) returns (LoginResponse);
   rpc Logout(LogoutRequest) returns (LogoutResponse);
   rpc ChangePassword(ChangePasswordRequest) returns (ChangePasswordResponse);
+  rpc GetProfile(GetProfileRequest) returns (GetProfileResponse);
 }
 
 message RegisterRequest {
@@ -50,4 +52,17 @@ message ChangePasswordRequest {
 
 message ChangePasswordResponse {
   common.BaseResponse base = 1;
+}
+
+message GetProfileRequest {
+  
+}
+
+message GetProfileResponse {
+  common.BaseResponse base = 1;
+  string user_id = 2;
+  string full_name = 3;
+  string email = 4;
+  string role_code = 5;
+  google.protobuf.Timestamp member_since = 6;
 }

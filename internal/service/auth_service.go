@@ -18,6 +18,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type IAuthService interface {
@@ -25,6 +26,7 @@ type IAuthService interface {
 	Login(ctx context.Context, request *auth.LoginRequest) (*auth.LoginResponse, error)
 	Logout(ctx context.Context, request *auth.LogoutRequest) (*auth.LogoutResponse, error)
 	ChangePassword(ctx context.Context, request *auth.ChangePasswordRequest) (*auth.ChangePasswordResponse, error)
+	GetProfile(ctx context.Context, request *auth.GetProfileRequest) (*auth.GetProfileResponse, error)
 }
 
 type authService struct {
@@ -129,13 +131,15 @@ func (as *authService) Login(ctx context.Context, request *auth.LoginRequest) (*
 func (as *authService) Logout(ctx context.Context, request *auth.LogoutRequest) (*auth.LogoutResponse, error) {
 	// dapatkan token dari metadata
 	jwtToken, err := jwtentity.ParseTokenFromContext(ctx)
-
-	// kembalikan token tadi hingga menjadi entity jwt
-	tokenClaims, err := jwtentity.GetClaimsFromToken(jwtToken)
 	if err != nil {
-		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
+		return nil, err
 	}
 
+	// kembalikan token tadi hingga menjadi entity jwt
+	tokenClaims, err := jwtentity.GetClaimsFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
 	// kita masukan token ke dalam memory db / cache
 	as.cacheService.Set(jwtToken, "", time.Duration(tokenClaims.ExpiresAt.Time.Unix()-time.Now().Unix())*time.Second)
 
@@ -196,6 +200,36 @@ func (as *authService) ChangePassword(ctx context.Context, request *auth.ChangeP
 
 	return &auth.ChangePasswordResponse{
 		Base: utils.SuccessResponse("Change password success"),
+	}, nil
+}
+
+func (as *authService) GetProfile(ctx context.Context, request *auth.GetProfileRequest) (*auth.GetProfileResponse, error) {
+	// dapatkan token dari metadata
+	claims, err := jwtentity.GetClaimsFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	//ambil data dari database
+	user, err := as.authRepository.GetUserByEmail(ctx, claims.Email)
+	if err != nil {
+		return nil, err
+	}
+
+	if user == nil {
+		return &auth.GetProfileResponse{
+			Base: utils.BadRequestResponse("User not found"),
+		}, nil
+	}
+
+	// kirim response
+	return &auth.GetProfileResponse{
+		Base:        utils.SuccessResponse("Get profile success"),
+		UserId:      claims.Subject,
+		FullName:    claims.FullName,
+		Email:       claims.Email,
+		RoleCode:    claims.Role,
+		MemberSince: timestamppb.New(user.CreatedAt),
 	}, nil
 }
 

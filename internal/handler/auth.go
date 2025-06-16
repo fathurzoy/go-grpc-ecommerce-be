@@ -101,6 +101,16 @@ func (sh *authHandler) ChangePassword(ctx context.Context, request *auth.ChangeP
 	return res, nil
 }
 
+// NewAuthHandler will create a new authHandler instance
+func (sh *authHandler) GetProfile(ctx context.Context, request *auth.GetProfileRequest) (*auth.GetProfileResponse, error) {
+	res, err := sh.authService.GetProfile(ctx, request)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
 func NewAuthHandler(authService service.IAuthService) *authHandler {
 	return &authHandler{
 		authService: authService,
