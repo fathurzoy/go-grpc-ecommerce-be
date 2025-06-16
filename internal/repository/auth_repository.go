@@ -18,7 +18,7 @@ type authRepository struct {
 
 // InsertUser implements IAuthRepository.
 func (ar *authRepository) InsertUser(ctx context.Context, user *entity.User) error {
-	_, err := ar.db.ExecContext(ctx, "INSERT INTO \"users\"  (id, email, password, full_name, role_code, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by, is_deleted) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
+	_, err := ar.db.ExecContext(ctx, "INSERT INTO \"user\"  (id, email, password, full_name, role_code, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by, is_deleted) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
 		user.Id, user.Email, user.Password, user.FullName, user.RoleCode, user.CreatedAt, user.CreatedBy, user.UpdatedAt, user.UpdatedBy, user.DeletedAt, user.DeletedBy, user.IsDeleted)
 	if err != nil {
 		return err
@@ -29,7 +29,7 @@ func (ar *authRepository) InsertUser(ctx context.Context, user *entity.User) err
 }
 
 func (ar *authRepository) GetUserByEmail(ctx context.Context, email string) (*entity.User, error) {
-	row := ar.db.QueryRowContext(ctx, "SELECT id, email, password, full_name, role_code FROM \"users\" WHERE email = $1 and is_deleted is false", email)
+	row := ar.db.QueryRowContext(ctx, "SELECT id, email, password, full_name, role_code FROM \"user\" WHERE email = $1 and is_deleted is false", email)
 	if row.Err() != nil {
 		return nil, row.Err()
 	}

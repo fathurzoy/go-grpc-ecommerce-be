@@ -59,5 +59,7 @@ func (sh *authHandler) Login(ctx context.Context, request *auth.LoginRequest) (*
 }
 
 func NewAuthHandler(authService service.IAuthService) *authHandler {
-	return &authHandler{}
+	return &authHandler{
+		authService: authService,
+	}
 }
