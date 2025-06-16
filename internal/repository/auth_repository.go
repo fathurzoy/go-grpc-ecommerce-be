@@ -29,13 +29,13 @@ func (ar *authRepository) InsertUser(ctx context.Context, user *entity.User) err
 }
 
 func (ar *authRepository) GetUserByEmail(ctx context.Context, email string) (*entity.User, error) {
-	row := ar.db.QueryRowContext(ctx, "SELECT id, email, password, full_name FROM \"users\" WHERE email = $1 and is_deleted is false", email)
+	row := ar.db.QueryRowContext(ctx, "SELECT id, email, password, full_name, role_code FROM \"users\" WHERE email = $1 and is_deleted is false", email)
 	if row.Err() != nil {
 		return nil, row.Err()
 	}
 
 	var user entity.User
-	err := row.Scan(&user.Id, &user.Email, &user.Password, &user.FullName)
+	err := row.Scan(&user.Id, &user.Email, &user.Password, &user.FullName, &user.RoleCode)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
