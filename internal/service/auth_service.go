@@ -3,7 +3,9 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/fathurzoy/go-grpc-ecommerce-be/internal/entity"
@@ -12,18 +14,22 @@ import (
 	"github.com/fathurzoy/go-grpc-ecommerce-be/pb/auth"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
+	gocache "github.com/patrickmn/go-cache"
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
 
 type IAuthService interface {
 	Register(ctx context.Context, request *auth.RegisterRequest) (*auth.RegisterResponse, error)
 	Login(ctx context.Context, request *auth.LoginRequest) (*auth.LoginResponse, error)
+	Logout(ctx context.Context, request *auth.LogoutRequest) (*auth.LogoutResponse, error)
 }
 
 type authService struct {
 	authRepository repository.IAuthRepository
+	cacheService   *gocache.Cache
 }
 
 func (as *authService) Register(ctx context.Context, request *auth.RegisterRequest) (*auth.RegisterResponse, error) {
@@ -120,8 +126,66 @@ func (as *authService) Login(ctx context.Context, request *auth.LoginRequest) (*
 	}, nil
 }
 
-func NewAuthService(authRepository repository.IAuthRepository) IAuthService {
+func (as *authService) Logout(ctx context.Context, request *auth.LogoutRequest) (*auth.LogoutResponse, error) {
+	// dapatkan token dari metadata
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
+	}
+
+	bearerToken, ok := md["authorization"]
+	if !ok {
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
+	}
+
+	if len(bearerToken) == 0 {
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
+	}
+
+	// bearer qweqeqweqw
+	tokenSplit := strings.Split(bearerToken[0], " ")
+
+	if len(tokenSplit) != 2 {
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
+	}
+	if tokenSplit[0] != "Bearer" {
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
+	}
+
+	jwtToken := tokenSplit[1]
+
+	// kembalikan token tadi hingga menjadi entity jwt
+	tokenClaims, err := jwt.ParseWithClaims(jwtToken, &entity.JwtClaims{}, func(t *jwt.Token) (interface{}, error) {
+		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
+		}
+		return []byte(os.Getenv("JWT_SECRET_KEY")), nil
+	})
+	if err != nil {
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
+	}
+
+	if !tokenClaims.Valid {
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
+	}
+
+	var claims *entity.JwtClaims
+	if claims, ok = tokenClaims.Claims.(*entity.JwtClaims); !ok {
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
+	}
+
+	// kita masukan token ke dalam memory db / cache
+	as.cacheService.Set(jwtToken, "", time.Duration(claims.ExpiresAt.Time.Unix()-time.Now().Unix())*time.Second)
+
+	// kirim response
+	return &auth.LogoutResponse{
+		Base: utils.SuccessResponse("Logout success"),
+	}, nil
+}
+
+func NewAuthService(authRepository repository.IAuthRepository, cacheService *gocache.Cache) IAuthService {
 	return &authService{
 		authRepository: authRepository,
+		cacheService:   cacheService,
 	}
 }

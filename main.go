@@ -5,6 +5,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"time"
 
 	"github.com/fathurzoy/go-grpc-ecommerce-be/internal/handler"
 	"github.com/fathurzoy/go-grpc-ecommerce-be/internal/repository"
@@ -15,6 +16,7 @@ import (
 	"github.com/fathurzoy/go-grpc-ecommerce-be/pkg/database"
 	"github.com/fathurzoy/go-grpc-ecommerce-be/pkg/grpcmiddleware"
 	"github.com/joho/godotenv"
+	gocache "github.com/patrickmn/go-cache"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -31,10 +33,12 @@ func main() {
 	db := database.ConnectDB(ctx, os.Getenv("DB_URI"))
 	log.Println("Database connected")
 
+	cacheService := gocache.New(time.Hour*24, time.Hour)
+
 	// serviceHandler := handler.NewServiceHandler()
 
 	authRepository := repository.NewAuthRepository(db)
-	authService := service.NewAuthService(authRepository)
+	authService := service.NewAuthService(authRepository, cacheService)
 	authHandler := handler.NewAuthHandler(authService)
 
 	serv := grpc.NewServer(grpc.ChainUnaryInterceptor(grpcmiddleware.ErrorMiddleware))
