@@ -3,12 +3,14 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"errors"
 
 	"github.com/fathurzoy/go-grpc-ecommerce-be/internal/entity"
 )
 
 type IProductRepository interface {
 	CreateNewProduct(ctx context.Context, product *entity.Product) error
+	GetProductById(ctx context.Context, id string) (*entity.Product, error)
 }
 
 type productRepository struct {
@@ -22,6 +24,31 @@ func (repo *productRepository) CreateNewProduct(ctx context.Context, product *en
 	}
 
 	return nil
+}
+
+func (repo *productRepository) GetProductById(ctx context.Context, id string) (*entity.Product, error) {
+	var productEntity entity.Product
+
+	row := repo.db.QueryRowContext(ctx, "SELECT id, name, description, price, image_file_name FROM product WHERE id = $1", id)
+	if row.Err() != nil {
+		return nil, row.Err()
+	}
+
+	err := row.Scan(
+		&productEntity.Id,
+		&productEntity.Name,
+		&productEntity.Description,
+		&productEntity.Price,
+		&productEntity.ImageFileName,
+	)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return &productEntity, nil
 }
 
 func NewProductRepository(db *sql.DB) IProductRepository {
