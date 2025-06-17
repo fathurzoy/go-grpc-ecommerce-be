@@ -10,7 +10,7 @@ import "buf/validate/validate.proto";
 service ProductSerivice {
   rpc CreateProduct (CreateProductRequest) returns (CreateProductResponse);
   rpc DetailProduct (DetailProductRequest) returns (DetailProductResponse);
-  // rpc GetProduct (GetProductRequest) returns (GetProductResponse);
+  rpc EditProduct (EditProductRequest) returns (EditProductResponse);
   // rpc UpdateProduct (UpdateProductRequest) returns (UpdateProductResponse);
   // rpc DeleteProduct (DeleteProductRequest) returns (DeleteProductResponse);
 }
@@ -38,4 +38,17 @@ message DetailProductResponse {
   string description = 4;
   double price = 5;
   string image_url = 6;
+}
+
+message EditProductRequest {
+  string id = 1 [(buf.validate.field).string = { min_len: 1 , max_len: 255}];
+  string name = 2 [(buf.validate.field).string = { min_len: 1 , max_len: 255}];
+  string description = 3 [(buf.validate.field).string = { min_len: 1 , max_len: 255}];
+  double price = 4 [(buf.validate.field).double.gte = 0];
+  string image_file_name = 5 [(buf.validate.field).string = { min_len: 1 , max_len: 255}];
+}
+
+message EditProductResponse {
+  common.BaseResponse base = 1;
+  string id = 2;
 }

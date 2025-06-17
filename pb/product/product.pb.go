@@ -271,6 +271,134 @@ func (x *DetailProductResponse) GetImageUrl() string {
 	return ""
 }
 
+type EditProductRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	Price         float64                `protobuf:"fixed64,4,opt,name=price,proto3" json:"price,omitempty"`
+	ImageFileName string                 `protobuf:"bytes,5,opt,name=image_file_name,json=imageFileName,proto3" json:"image_file_name,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *EditProductRequest) Reset() {
+	*x = EditProductRequest{}
+	mi := &file_product_product_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EditProductRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EditProductRequest) ProtoMessage() {}
+
+func (x *EditProductRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_product_product_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EditProductRequest.ProtoReflect.Descriptor instead.
+func (*EditProductRequest) Descriptor() ([]byte, []int) {
+	return file_product_product_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *EditProductRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *EditProductRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *EditProductRequest) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *EditProductRequest) GetPrice() float64 {
+	if x != nil {
+		return x.Price
+	}
+	return 0
+}
+
+func (x *EditProductRequest) GetImageFileName() string {
+	if x != nil {
+		return x.ImageFileName
+	}
+	return ""
+}
+
+type EditProductResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *common.BaseResponse   `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	Id            string                 `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *EditProductResponse) Reset() {
+	*x = EditProductResponse{}
+	mi := &file_product_product_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EditProductResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EditProductResponse) ProtoMessage() {}
+
+func (x *EditProductResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_product_product_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EditProductResponse.ProtoReflect.Descriptor instead.
+func (*EditProductResponse) Descriptor() ([]byte, []int) {
+	return file_product_product_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *EditProductResponse) GetBase() *common.BaseResponse {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *EditProductResponse) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
 var File_product_product_proto protoreflect.FileDescriptor
 
 const file_product_product_proto_rawDesc = "" +
@@ -296,10 +424,24 @@ const file_product_product_proto_rawDesc = "" +
 	"\x04name\x18\x03 \x01(\tR\x04name\x12 \n" +
 	"\vdescription\x18\x04 \x01(\tR\vdescription\x12\x14\n" +
 	"\x05price\x18\x05 \x01(\x01R\x05price\x12\x1b\n" +
-	"\timage_url\x18\x06 \x01(\tR\bimageUrl2\xb1\x01\n" +
+	"\timage_url\x18\x06 \x01(\tR\bimageUrl\"\xd8\x01\n" +
+	"\x12EditProductRequest\x12\x1a\n" +
+	"\x02id\x18\x01 \x01(\tB\n" +
+	"\xbaH\ar\x05\x10\x01\x18\xff\x01R\x02id\x12\x1e\n" +
+	"\x04name\x18\x02 \x01(\tB\n" +
+	"\xbaH\ar\x05\x10\x01\x18\xff\x01R\x04name\x12,\n" +
+	"\vdescription\x18\x03 \x01(\tB\n" +
+	"\xbaH\ar\x05\x10\x01\x18\xff\x01R\vdescription\x12$\n" +
+	"\x05price\x18\x04 \x01(\x01B\x0e\xbaH\v\x12\t)\x00\x00\x00\x00\x00\x00\x00\x00R\x05price\x122\n" +
+	"\x0fimage_file_name\x18\x05 \x01(\tB\n" +
+	"\xbaH\ar\x05\x10\x01\x18\xff\x01R\rimageFileName\"O\n" +
+	"\x13EditProductResponse\x12(\n" +
+	"\x04base\x18\x01 \x01(\v2\x14.common.BaseResponseR\x04base\x12\x0e\n" +
+	"\x02id\x18\x02 \x01(\tR\x02id2\xfb\x01\n" +
 	"\x0fProductSerivice\x12N\n" +
 	"\rCreateProduct\x12\x1d.product.CreateProductRequest\x1a\x1e.product.CreateProductResponse\x12N\n" +
-	"\rDetailProduct\x12\x1d.product.DetailProductRequest\x1a\x1e.product.DetailProductResponseB6Z4github.com/fathurzoy/go-grpc-ecommerce-be/pb/productb\x06proto3"
+	"\rDetailProduct\x12\x1d.product.DetailProductRequest\x1a\x1e.product.DetailProductResponse\x12H\n" +
+	"\vEditProduct\x12\x1b.product.EditProductRequest\x1a\x1c.product.EditProductResponseB6Z4github.com/fathurzoy/go-grpc-ecommerce-be/pb/productb\x06proto3"
 
 var (
 	file_product_product_proto_rawDescOnce sync.Once
@@ -313,26 +455,31 @@ func file_product_product_proto_rawDescGZIP() []byte {
 	return file_product_product_proto_rawDescData
 }
 
-var file_product_product_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_product_product_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_product_product_proto_goTypes = []any{
 	(*CreateProductRequest)(nil),  // 0: product.CreateProductRequest
 	(*CreateProductResponse)(nil), // 1: product.CreateProductResponse
 	(*DetailProductRequest)(nil),  // 2: product.DetailProductRequest
 	(*DetailProductResponse)(nil), // 3: product.DetailProductResponse
-	(*common.BaseResponse)(nil),   // 4: common.BaseResponse
+	(*EditProductRequest)(nil),    // 4: product.EditProductRequest
+	(*EditProductResponse)(nil),   // 5: product.EditProductResponse
+	(*common.BaseResponse)(nil),   // 6: common.BaseResponse
 }
 var file_product_product_proto_depIdxs = []int32{
-	4, // 0: product.CreateProductResponse.base:type_name -> common.BaseResponse
-	4, // 1: product.DetailProductResponse.base:type_name -> common.BaseResponse
-	0, // 2: product.ProductSerivice.CreateProduct:input_type -> product.CreateProductRequest
-	2, // 3: product.ProductSerivice.DetailProduct:input_type -> product.DetailProductRequest
-	1, // 4: product.ProductSerivice.CreateProduct:output_type -> product.CreateProductResponse
-	3, // 5: product.ProductSerivice.DetailProduct:output_type -> product.DetailProductResponse
-	4, // [4:6] is the sub-list for method output_type
-	2, // [2:4] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	6, // 0: product.CreateProductResponse.base:type_name -> common.BaseResponse
+	6, // 1: product.DetailProductResponse.base:type_name -> common.BaseResponse
+	6, // 2: product.EditProductResponse.base:type_name -> common.BaseResponse
+	0, // 3: product.ProductSerivice.CreateProduct:input_type -> product.CreateProductRequest
+	2, // 4: product.ProductSerivice.DetailProduct:input_type -> product.DetailProductRequest
+	4, // 5: product.ProductSerivice.EditProduct:input_type -> product.EditProductRequest
+	1, // 6: product.ProductSerivice.CreateProduct:output_type -> product.CreateProductResponse
+	3, // 7: product.ProductSerivice.DetailProduct:output_type -> product.DetailProductResponse
+	5, // 8: product.ProductSerivice.EditProduct:output_type -> product.EditProductResponse
+	6, // [6:9] is the sub-list for method output_type
+	3, // [3:6] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_product_product_proto_init() }
@@ -346,7 +493,7 @@ func file_product_product_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_product_product_proto_rawDesc), len(file_product_product_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
