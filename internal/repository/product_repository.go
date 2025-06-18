@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/fathurzoy/go-grpc-ecommerce-be/internal/entity"
+	"github.com/fathurzoy/go-grpc-ecommerce-be/pb/common"
 )
 
 type IProductRepository interface {
@@ -14,6 +15,7 @@ type IProductRepository interface {
 	GetProductById(ctx context.Context, id string) (*entity.Product, error)
 	UpdateProduct(ctx context.Context, product *entity.Product) error
 	DeleteProduct(ctx context.Context, id string, deletedAt time.Time, deletedBy *string) error
+	GetProductPagination(ctx context.Context, pagination *common.PaginationRequest) ([]*entity.Product, *common.PaginationResponse, error)
 }
 
 type productRepository struct {
@@ -80,6 +82,60 @@ func (repo *productRepository) DeleteProduct(ctx context.Context, id string, del
 	}
 
 	return nil
+}
+
+func (repo *productRepository) GetProductPagination(ctx context.Context, pagination *common.PaginationRequest) ([]*entity.Product, *common.PaginationResponse, error) {
+	row := repo.db.QueryRowContext(ctx, "SELECT COUNT(*) FROM product WHERE is_deleted = $1", false)
+	if row.Err() != nil {
+		return nil, nil, row.Err()
+	}
+
+	var totalCount int
+	err := row.Scan(&totalCount)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	offset := (pagination.CurrentPage - 1) * pagination.ItemPerPage
+
+	// Hitung total halaman
+	totalPages := (totalCount + int(pagination.ItemPerPage) - 1) / int(pagination.ItemPerPage)
+
+	rows, err := repo.db.QueryContext(ctx, `
+		SELECT id, name, description, price, image_file_name 
+		FROM product 
+		WHERE is_deleted = $1 
+		ORDER BY created_at DESC 
+		LIMIT $2 OFFSET $3
+	`, false, pagination.ItemPerPage, offset)
+	if err != nil {
+		return nil, nil, err
+	}
+	defer rows.Close()
+
+	var products []*entity.Product
+	for rows.Next() {
+		var productEntity entity.Product
+		if err := rows.Scan(
+			&productEntity.Id,
+			&productEntity.Name,
+			&productEntity.Description,
+			&productEntity.Price,
+			&productEntity.ImageFileName,
+		); err != nil {
+			return nil, nil, err
+		}
+		products = append(products, &productEntity)
+	}
+
+	paginationResponse := &common.PaginationResponse{
+		CurrentPage:    pagination.CurrentPage,
+		ItemPerPage:    pagination.ItemPerPage,
+		TotalPageCount: int32(totalPages),
+		TotalItemCount: int32(totalCount),
+	}
+
+	return products, paginationResponse, nil
 }
 
 func NewProductRepository(db *sql.DB) IProductRepository {

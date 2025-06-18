@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+option go_package = "github.com/fathurzoy/go-grpc-ecommerce-be/pb/common";
+
+package common;
+
+message PaginationRequest {
+  int32 current_page = 1;
+  int32 item_per_page = 2;
+}
+
+message PaginationResponse {
+  int32 current_page = 1;
+  int32 total_page_count = 2;
+  int32 item_per_page = 3;
+  int32 total_item_count = 4;
+}

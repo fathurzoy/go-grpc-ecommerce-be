@@ -5,6 +5,8 @@ option go_package = "github.com/fathurzoy/go-grpc-ecommerce-be/pb/product";
 package product;
 
 import "common/base_response.proto";
+import "common/pagination.proto";
+
 import "buf/validate/validate.proto";
 
 service ProductSerivice {
@@ -12,6 +14,7 @@ service ProductSerivice {
   rpc DetailProduct (DetailProductRequest) returns (DetailProductResponse);
   rpc EditProduct (EditProductRequest) returns (EditProductResponse);
   rpc DeleteProduct (DeleteProductRequest) returns (DeleteProductResponse);
+  rpc ListProduct (ListProductRequest) returns (ListProductResponse);
 }
 
 message CreateProductRequest {
@@ -58,4 +61,22 @@ message DeleteProductRequest {
 
 message DeleteProductResponse {
   common.BaseResponse base = 1;
+}
+
+message ListProductRequest {
+  common.PaginationRequest pagination = 1;
+}
+
+message ListProductResponseItem {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  double price = 4;
+  string image_url = 5;
+}
+
+message ListProductResponse {
+  common.BaseResponse base = 1;
+  common.PaginationResponse pagination = 2;
+  repeated ListProductResponseItem data = 3;
 }

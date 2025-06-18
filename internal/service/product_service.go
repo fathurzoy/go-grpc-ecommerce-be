@@ -12,6 +12,7 @@ import (
 	jwtentity "github.com/fathurzoy/go-grpc-ecommerce-be/internal/entity/jwt"
 	"github.com/fathurzoy/go-grpc-ecommerce-be/internal/repository"
 	"github.com/fathurzoy/go-grpc-ecommerce-be/internal/utils"
+	"github.com/fathurzoy/go-grpc-ecommerce-be/pb/common"
 	"github.com/fathurzoy/go-grpc-ecommerce-be/pb/product"
 	"github.com/google/uuid"
 )
@@ -21,6 +22,7 @@ type IProductService interface {
 	DetailProduct(ctx context.Context, request *product.DetailProductRequest) (*product.DetailProductResponse, error)
 	EditProduct(ctx context.Context, request *product.EditProductRequest) (*product.EditProductResponse, error)
 	DeleteProduct(ctx context.Context, request *product.DeleteProductRequest) (*product.DeleteProductResponse, error)
+	ListProduct(ctx context.Context, request *product.ListProductRequest) (*product.ListProductResponse, error)
 }
 
 type productService struct {
@@ -205,6 +207,38 @@ func (ps *productService) DeleteProduct(ctx context.Context, request *product.De
 	// kirim response
 	return &product.DeleteProductResponse{
 		Base: utils.SuccessResponse("Delete product success"),
+	}, nil
+}
+
+func (ps *productService) ListProduct(ctx context.Context, request *product.ListProductRequest) (*product.ListProductResponse, error) {
+	//buat default request pagination
+	if request.Pagination == nil {
+		request.Pagination = &common.PaginationRequest{
+			CurrentPage: 1,
+			ItemPerPage: 10,
+		}
+	}
+
+	products, paginationResponse, err := ps.productRepository.GetProductPagination(ctx, request.Pagination)
+	if err != nil {
+		return nil, err
+	}
+
+	var data []*product.ListProductResponseItem = make([]*product.ListProductResponseItem, 0)
+	for _, v := range products {
+		data = append(data, &product.ListProductResponseItem{
+			Id:          v.Id,
+			Name:        v.Name,
+			Description: v.Description,
+			Price:       v.Price,
+			ImageUrl:    fmt.Sprintf("%s/product/%s", os.Getenv("STORAGE_SERVICE_URL"), v.ImageFileName),
+		})
+	}
+
+	return &product.ListProductResponse{
+		Base:       utils.SuccessResponse("Get product success"),
+		Data:       data,
+		Pagination: paginationResponse,
 	}, nil
 }
 
