@@ -20,6 +20,7 @@ type IProductService interface {
 	CreateProduct(ctx context.Context, request *product.CreateProductRequest) (*product.CreateProductResponse, error)
 	DetailProduct(ctx context.Context, request *product.DetailProductRequest) (*product.DetailProductResponse, error)
 	EditProduct(ctx context.Context, request *product.EditProductRequest) (*product.EditProductResponse, error)
+	DeleteProduct(ctx context.Context, request *product.DeleteProductRequest) (*product.DeleteProductResponse, error)
 }
 
 type productService struct {
@@ -162,6 +163,48 @@ func (ps *productService) EditProduct(ctx context.Context, request *product.Edit
 	return &product.EditProductResponse{
 		Base: utils.SuccessResponse("Edit product success"),
 		Id:   request.Id,
+	}, nil
+}
+
+func (ps *productService) DeleteProduct(ctx context.Context, request *product.DeleteProductRequest) (*product.DeleteProductResponse, error) {
+	// valdiasi apakah id yang dikirim itu ada di db
+	productEntity, err := ps.productRepository.GetProductById(ctx, request.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	if productEntity == nil {
+		return &product.DeleteProductResponse{
+			Base: utils.NotFoundResponse("Product not found"),
+		}, nil
+	}
+
+	// cek apakah user admin
+	claims, err := jwtentity.GetClaimsFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if claims.Role != entity.UserRoleAdmin {
+		return nil, utils.UnauthenticatedResponse()
+	}
+
+	// delete ke db
+	err = ps.productRepository.DeleteProduct(ctx, request.Id, time.Now(), &claims.FullName)
+	if err != nil {
+		return nil, err
+	}
+
+	imagePath := filepath.Join("storage", "product", productEntity.ImageFileName)
+	err = os.Remove(imagePath)
+	if err != nil {
+		log.Println(err)
+		// return nil, err
+	}
+
+	// kirim response
+	return &product.DeleteProductResponse{
+		Base: utils.SuccessResponse("Delete product success"),
 	}, nil
 }
 

@@ -11,8 +11,7 @@ service ProductSerivice {
   rpc CreateProduct (CreateProductRequest) returns (CreateProductResponse);
   rpc DetailProduct (DetailProductRequest) returns (DetailProductResponse);
   rpc EditProduct (EditProductRequest) returns (EditProductResponse);
-  // rpc UpdateProduct (UpdateProductRequest) returns (UpdateProductResponse);
-  // rpc DeleteProduct (DeleteProductRequest) returns (DeleteProductResponse);
+  rpc DeleteProduct (DeleteProductRequest) returns (DeleteProductResponse);
 }
 
 message CreateProductRequest {
@@ -51,4 +50,12 @@ message EditProductRequest {
 message EditProductResponse {
   common.BaseResponse base = 1;
   string id = 2;
+}
+
+message DeleteProductRequest {
+  string id = 1 [(buf.validate.field).string = { min_len: 1 , max_len: 255}];
+}
+
+message DeleteProductResponse {
+  common.BaseResponse base = 1;
 }
