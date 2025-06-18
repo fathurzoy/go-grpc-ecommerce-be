@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/fathurzoy/go-grpc-ecommerce-be/internal/entity"
@@ -15,6 +16,7 @@ import (
 
 type ICartService interface {
 	AddProductToCart(ctx context.Context, request *cart.AddProductToCartRequest) (*cart.AddProductToCartResponse, error)
+	ListCart(ctx context.Context, request *cart.ListCartRequest) (*cart.ListCartResponse, error)
 }
 
 type cartService struct {
@@ -83,6 +85,36 @@ func (cs *cartService) AddProductToCart(ctx context.Context, request *cart.AddPr
 	return &cart.AddProductToCartResponse{
 		Base: utils.SuccessResponse("Add product to cart success"),
 		Id:   newCartEntity.Id,
+	}, nil
+}
+
+func (cs *cartService) ListCart(ctx context.Context, request *cart.ListCartRequest) (*cart.ListCartResponse, error) {
+	claims, err := jwtentity.GetClaimsFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	carts, err := cs.cartRepository.GetListCart(ctx, claims.Subject)
+	if err != nil {
+		return nil, err
+	}
+
+	var items []*cart.ListCartResponseItem
+	for _, cartEntity := range carts {
+		item := &cart.ListCartResponseItem{
+			CartId:          cartEntity.Id,
+			ProductId:       cartEntity.ProductId,
+			ProductName:     cartEntity.Product.Name,
+			ProductImageUrl: fmt.Sprintf("%s/product/%s", os.Getenv("STORAEGE_SERVICE_URL"), cartEntity.Product.ImageFileName),
+			ProductPrice:    cartEntity.Product.Price,
+			Quantity:        int32(cartEntity.Quantity),
+		}
+		items = append(items, item)
+	}
+
+	return &cart.ListCartResponse{
+		Base:  utils.SuccessResponse("List cart success"),
+		Items: items,
 	}, nil
 }
 

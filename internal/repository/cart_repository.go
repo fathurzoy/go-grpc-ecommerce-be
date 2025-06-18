@@ -12,6 +12,7 @@ type ICartRepository interface {
 	GetCartProductAndUserId(ctx context.Context, productId, userId string) (*entity.UserCart, error)
 	CreateNewCart(ctx context.Context, cartEntity *entity.UserCart) error
 	UpdateCart(ctx context.Context, cartEntity *entity.UserCart) error
+	GetListCart(ctx context.Context, userId string) ([]*entity.UserCart, error)
 }
 
 type cartRepository struct {
@@ -85,6 +86,55 @@ func (cr *cartRepository) UpdateCart(ctx context.Context, cartEntity *entity.Use
 		cartEntity.Id,
 	)
 	return err
+}
+
+func (cr *cartRepository) GetListCart(ctx context.Context, userId string) ([]*entity.UserCart, error) {
+	rows, err := cr.db.QueryContext(
+		ctx,
+		`SELECT uc.id, uc.user_id, uc.product_id, uc.quantity, uc.created_at, uc.created_by, uc.updated_at, uc.updated_by,
+		        p.id, p.name, p.description, p.price, p.image_file_name
+		   FROM user_cart uc
+		   JOIN product p ON uc.product_id = p.id
+		  WHERE uc.user_id = $1`,
+		userId,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var carts []*entity.UserCart
+	for rows.Next() {
+		var cart entity.UserCart
+		cart.Product = &entity.Product{}
+
+		err := rows.Scan(
+			&cart.Id,
+			&cart.UserId,
+			&cart.ProductId,
+			&cart.Quantity,
+			&cart.CreatedAt,
+			&cart.CreatedBy,
+			&cart.UpdatedAt,
+			&cart.UpdatedBy,
+			&cart.Product.Id,
+			&cart.Product.Name,
+			&cart.Product.Description,
+			&cart.Product.Price,
+			&cart.Product.ImageFileName,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		carts = append(carts, &cart)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return carts, nil
 }
 
 func NewCartRepository(db *sql.DB) ICartRepository {
