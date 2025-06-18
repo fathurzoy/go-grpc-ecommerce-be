@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+option go_package = "github.com/fathurzoy/go-grpc-ecommerce-be/pb/cart";
+
+import "common/base_response.proto";
+import "buf/validate/validate.proto";
+
+package cart;
+
+service CartService {
+  rpc AddProductToCart(AddProductToCartRequest) returns (AddProductToCartResponse);
+}
+
+message AddProductToCartRequest {
+  string product_id = 1 [(buf.validate.field).string = { min_len: 1 , max_len: 255}];
+}
+
+message AddProductToCartResponse {
+  common.BaseResponse base = 1;
+  string id = 2;
+}

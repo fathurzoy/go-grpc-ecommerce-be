@@ -12,6 +12,7 @@ import (
 	"github.com/fathurzoy/go-grpc-ecommerce-be/internal/repository"
 	"github.com/fathurzoy/go-grpc-ecommerce-be/internal/service"
 	"github.com/fathurzoy/go-grpc-ecommerce-be/pb/auth"
+	"github.com/fathurzoy/go-grpc-ecommerce-be/pb/cart"
 	"github.com/fathurzoy/go-grpc-ecommerce-be/pb/product"
 
 	// "github.com/fathurzoy/go-grpc-ecommerce-be/pb/service"
@@ -48,10 +49,15 @@ func main() {
 	productService := service.NewProductService(productRepository)
 	productHandler := handler.NewProductHandler(productService)
 
+	cartRepository := repository.NewCartRepository(db)
+	cartService := service.NewCartService(productRepository, cartRepository)
+	cartHandler := handler.NewCartHandler(cartService)
+
 	serv := grpc.NewServer(grpc.ChainUnaryInterceptor(grpcmiddleware.ErrorMiddleware, authMiddleware.Middleware))
 
 	auth.RegisterAuthServiceServer(serv, authHandler)
 	product.RegisterProductSeriviceServer(serv, productHandler)
+	cart.RegisterCartServiceServer(serv, cartHandler)
 
 	// service.RegisterHelloWorldServiceServer(serv, serviceHandler)
 
