@@ -18,6 +18,7 @@ type IProductRepository interface {
 	DeleteProduct(ctx context.Context, id string, deletedAt time.Time, deletedBy *string) error
 	GetProductPagination(ctx context.Context, pagination *common.PaginationRequest) ([]*entity.Product, *common.PaginationResponse, error)
 	GetProductAdminPagination(ctx context.Context, pagination *common.PaginationRequest) ([]*entity.Product, *common.PaginationResponse, error)
+	GetProductHighlight(ctx context.Context) ([]*entity.Product, error)
 }
 
 type productRepository struct {
@@ -202,6 +203,32 @@ func (repo *productRepository) GetProductAdminPagination(ctx context.Context, pa
 	}
 
 	return products, paginationResponse, nil
+}
+
+func (repo *productRepository) GetProductHighlight(ctx context.Context) ([]*entity.Product, error) {
+
+	rows, err := repo.db.QueryContext(ctx, "SELECT id, name, description, price, image_file_name FROM product WHERE is_deleted = $1 ORDER BY created_at DESC LIMIT 5 ", false)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var products []*entity.Product
+	for rows.Next() {
+		var productEntity entity.Product
+		if err := rows.Scan(
+			&productEntity.Id,
+			&productEntity.Name,
+			&productEntity.Description,
+			&productEntity.Price,
+			&productEntity.ImageFileName,
+		); err != nil {
+			return nil, err
+		}
+		products = append(products, &productEntity)
+	}
+
+	return products, nil
 }
 
 func NewProductRepository(db *sql.DB) IProductRepository {

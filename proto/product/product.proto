@@ -16,6 +16,7 @@ service ProductSerivice {
   rpc DeleteProduct (DeleteProductRequest) returns (DeleteProductResponse);
   rpc ListProduct (ListProductRequest) returns (ListProductResponse);
   rpc ListProductAdmin (ListProductAdminRequest) returns (ListProductAdminResponse);
+  rpc HighlightProduct (HighlightProductRequest) returns (HighlightProductResponse);
 }
 
 message CreateProductRequest {
@@ -98,4 +99,21 @@ message ListProductAdminResponse {
   common.BaseResponse base = 1;
   common.PaginationResponse pagination = 2;
   repeated ListProductAdminResponseItem data = 3;
+}
+
+message HighlightProductRequest {
+}
+
+message HighlightProductResponseItem {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  double price = 4;
+  string image_url = 5;
+}
+
+message HighlightProductResponse {
+  common.BaseResponse base = 1;
+  common.PaginationResponse pagination = 2;
+  repeated HighlightProductResponseItem data = 3;
 }
