@@ -11,6 +11,7 @@ service CartService {
   rpc AddProductToCart(AddProductToCartRequest) returns (AddProductToCartResponse);
   rpc ListCart(ListCartRequest) returns (ListCartResponse);
   rpc DeleteCart(DeleteCartRequest) returns (DeleteCartResponse);
+  rpc UpdateCartQuantity(UpdateCartQuantityRequest) returns (UpdateCartQuantityResponse);
 }
 
 message AddProductToCartRequest {
@@ -44,5 +45,14 @@ message DeleteCartRequest {
 }
 
 message DeleteCartResponse {
+  common.BaseResponse base = 1;
+}
+
+message UpdateCartQuantityRequest {
+  string cart_id = 1 [(buf.validate.field).string = { min_len: 1 , max_len: 255}];
+  int32 new_quantity = 2 [(buf.validate.field).int64.gte = 0];
+}
+
+message UpdateCartQuantityResponse {
   common.BaseResponse base = 1;
 }
