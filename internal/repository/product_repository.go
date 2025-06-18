@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/fathurzoy/go-grpc-ecommerce-be/internal/entity"
@@ -14,6 +15,7 @@ import (
 type IProductRepository interface {
 	CreateNewProduct(ctx context.Context, product *entity.Product) error
 	GetProductById(ctx context.Context, id string) (*entity.Product, error)
+	GetProductsByIds(ctx context.Context, ids []string) ([]*entity.Product, error)
 	UpdateProduct(ctx context.Context, product *entity.Product) error
 	DeleteProduct(ctx context.Context, id string, deletedAt time.Time, deletedBy *string) error
 	GetProductPagination(ctx context.Context, pagination *common.PaginationRequest) ([]*entity.Product, *common.PaginationResponse, error)
@@ -57,6 +59,39 @@ func (repo *productRepository) GetProductById(ctx context.Context, id string) (*
 	}
 
 	return &productEntity, nil
+}
+
+func (repo *productRepository) GetProductsByIds(ctx context.Context, ids []string) ([]*entity.Product, error) {
+	queryIds := make([]string, len(ids))
+	for i, id := range ids {
+		queryIds[i] = fmt.Sprintf("'%s'", id)
+	}
+
+	rows, err := repo.db.QueryContext(
+		ctx,
+		fmt.Sprintf("SELECT id, name, price, image_file_name FROM product WHERE id in (%s) and is_deleted = false", strings.Join(queryIds, ",")),
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var products []*entity.Product
+	for rows.Next() {
+		var product entity.Product
+		err := rows.Scan(
+			&product.Id,
+			&product.Name,
+			&product.Price,
+			&product.ImageFileName,
+		)
+		if err != nil {
+			return nil, err
+		}
+		products = append(products, &product)
+	}
+
+	return products, nil
 }
 
 func (repo *productRepository) UpdateProduct(ctx context.Context, product *entity.Product) error {

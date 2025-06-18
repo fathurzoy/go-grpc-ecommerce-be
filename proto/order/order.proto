@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+option go_package = "github.com/fathurzoy/go-grpc-ecommerce-be/pb/order";
+
+import "buf/validate/validate.proto";
+import "common/base_response.proto";
+
+package order;
+
+service OrderService {
+  rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse);
+}
+
+message CreateOrderRequestProductItem {
+  string id = 1;
+  int32 quantity = 2;
+}
+
+message CreateOrderRequest {
+  string full_name = 1 [(buf.validate.field).string = { min_len: 1 , max_len: 255}];
+  string address = 2 [(buf.validate.field).string = { min_len: 1 , max_len: 255}];
+  string phone_number = 3 [(buf.validate.field).string = { min_len: 1 , max_len: 255}];
+  string notes = 4 [(buf.validate.field).string = { max_len: 255}];
+  repeated CreateOrderRequestProductItem products = 5;
+}
+
+message CreateOrderResponse {
+  common.BaseResponse base = 1;
+  string id = 2;
+}
