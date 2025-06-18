@@ -10,6 +10,7 @@ package cart;
 service CartService {
   rpc AddProductToCart(AddProductToCartRequest) returns (AddProductToCartResponse);
   rpc ListCart(ListCartRequest) returns (ListCartResponse);
+  rpc DeleteCart(DeleteCartRequest) returns (DeleteCartResponse);
 }
 
 message AddProductToCartRequest {
@@ -36,4 +37,12 @@ message ListCartResponseItem {
 message ListCartResponse {
   common.BaseResponse base = 1;
   repeated ListCartResponseItem items = 2;
+}
+
+message DeleteCartRequest {
+  string cart_id = 1 [(buf.validate.field).string = { min_len: 1 , max_len: 255}];
+}
+
+message DeleteCartResponse {
+  common.BaseResponse base = 1;
 }

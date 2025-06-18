@@ -13,6 +13,8 @@ type ICartRepository interface {
 	CreateNewCart(ctx context.Context, cartEntity *entity.UserCart) error
 	UpdateCart(ctx context.Context, cartEntity *entity.UserCart) error
 	GetListCart(ctx context.Context, userId string) ([]*entity.UserCart, error)
+	GetCartById(ctx context.Context, cartId string) (*entity.UserCart, error)
+	DeleteCart(ctx context.Context, cartId string) error
 }
 
 type cartRepository struct {
@@ -135,6 +137,51 @@ func (cr *cartRepository) GetListCart(ctx context.Context, userId string) ([]*en
 	}
 
 	return carts, nil
+}
+
+func (cr *cartRepository) GetCartById(ctx context.Context, cartId string) (*entity.UserCart, error) {
+	// TODO: implement
+	row := cr.db.QueryRowContext(
+		ctx,
+		"SELECT id, user_id, product_id, quantity, created_at, created_by, updated_at, updated_by FROM user_cart WHERE id = $1",
+		cartId,
+	)
+	if row.Err() != nil {
+		return nil, row.Err()
+	}
+
+	var cartEntity entity.UserCart
+	err := row.Scan(
+		&cartEntity.Id,
+		&cartEntity.UserId,
+		&cartEntity.ProductId,
+		&cartEntity.Quantity,
+		&cartEntity.CreatedAt,
+		&cartEntity.CreatedBy,
+		&cartEntity.UpdatedAt,
+		&cartEntity.UpdatedBy,
+	)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return &cartEntity, nil
+}
+
+func (cr *cartRepository) DeleteCart(ctx context.Context, cartId string) error {
+	_, err := cr.db.ExecContext(
+		ctx,
+		"DELETE FROM user_cart WHERE id = $1",
+		cartId,
+	)
+	if err != nil {
+		return err
+	}
+
+	return err
 }
 
 func NewCartRepository(db *sql.DB) ICartRepository {

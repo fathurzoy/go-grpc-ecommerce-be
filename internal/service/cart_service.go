@@ -17,6 +17,7 @@ import (
 type ICartService interface {
 	AddProductToCart(ctx context.Context, request *cart.AddProductToCartRequest) (*cart.AddProductToCartResponse, error)
 	ListCart(ctx context.Context, request *cart.ListCartRequest) (*cart.ListCartResponse, error)
+	DeleteCart(ctx context.Context, request *cart.DeleteCartRequest) (*cart.DeleteCartResponse, error)
 }
 
 type cartService struct {
@@ -115,6 +116,41 @@ func (cs *cartService) ListCart(ctx context.Context, request *cart.ListCartReque
 	return &cart.ListCartResponse{
 		Base:  utils.SuccessResponse("List cart success"),
 		Items: items,
+	}, nil
+}
+
+func (cs *cartService) DeleteCart(ctx context.Context, request *cart.DeleteCartRequest) (*cart.DeleteCartResponse, error) {
+	// dapat data user id
+	claims, err := jwtentity.GetClaimsFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// dapat data cart
+	cartEntity, err := cs.cartRepository.GetCartById(ctx, request.CartId)
+	if err != nil {
+		return nil, err
+	}
+	if cartEntity == nil {
+		return &cart.DeleteCartResponse{
+			Base: utils.NotFoundResponse("Cart not found"),
+		}, nil
+	}
+
+	// cocokan data user id di cart dengan auth
+	if cartEntity.UserId != claims.Subject {
+		return &cart.DeleteCartResponse{
+			Base: utils.BadRequestResponse("Forbidden"),
+		}, nil
+	}
+
+	err = cs.cartRepository.DeleteCart(ctx, request.CartId)
+	if err != nil {
+		return nil, err
+	}
+
+	return &cart.DeleteCartResponse{
+		Base: utils.SuccessResponse("Delete cart success"),
 	}, nil
 }
 
