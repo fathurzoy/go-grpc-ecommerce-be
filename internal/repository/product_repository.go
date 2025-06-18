@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/fathurzoy/go-grpc-ecommerce-be/internal/entity"
@@ -16,6 +17,7 @@ type IProductRepository interface {
 	UpdateProduct(ctx context.Context, product *entity.Product) error
 	DeleteProduct(ctx context.Context, id string, deletedAt time.Time, deletedBy *string) error
 	GetProductPagination(ctx context.Context, pagination *common.PaginationRequest) ([]*entity.Product, *common.PaginationResponse, error)
+	GetProductAdminPagination(ctx context.Context, pagination *common.PaginationRequest) ([]*entity.Product, *common.PaginationResponse, error)
 }
 
 type productRepository struct {
@@ -108,6 +110,70 @@ func (repo *productRepository) GetProductPagination(ctx context.Context, paginat
 		ORDER BY created_at DESC 
 		LIMIT $2 OFFSET $3
 	`, false, pagination.ItemPerPage, offset)
+	if err != nil {
+		return nil, nil, err
+	}
+	defer rows.Close()
+
+	var products []*entity.Product
+	for rows.Next() {
+		var productEntity entity.Product
+		if err := rows.Scan(
+			&productEntity.Id,
+			&productEntity.Name,
+			&productEntity.Description,
+			&productEntity.Price,
+			&productEntity.ImageFileName,
+		); err != nil {
+			return nil, nil, err
+		}
+		products = append(products, &productEntity)
+	}
+
+	paginationResponse := &common.PaginationResponse{
+		CurrentPage:    pagination.CurrentPage,
+		ItemPerPage:    pagination.ItemPerPage,
+		TotalPageCount: int32(totalPages),
+		TotalItemCount: int32(totalCount),
+	}
+
+	return products, paginationResponse, nil
+}
+
+func (repo *productRepository) GetProductAdminPagination(ctx context.Context, pagination *common.PaginationRequest) ([]*entity.Product, *common.PaginationResponse, error) {
+	row := repo.db.QueryRowContext(ctx, "SELECT COUNT(*) FROM product")
+	if row.Err() != nil {
+		return nil, nil, row.Err()
+	}
+
+	var totalCount int
+	err := row.Scan(&totalCount)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	offset := (pagination.CurrentPage - 1) * pagination.ItemPerPage
+
+	// Hitung total halaman
+	totalPages := (totalCount + int(pagination.ItemPerPage) - 1) / int(pagination.ItemPerPage)
+
+	allowedSorts := map[string]string{
+		"name":        "name",
+		"description": "description",
+		"price":       "price",
+	}
+
+	orderQuery := " ORDER BY created_at DESC"
+	if pagination.Sort != nil && allowedSorts[pagination.Sort.Field] != "" {
+		direction := "ASC"
+		if pagination.Sort.Direction == "desc" {
+			direction = "DESC"
+		}
+		orderQuery = fmt.Sprintf(" ORDER BY %s %s", pagination.Sort.Field, direction)
+	}
+
+	baseQuery := fmt.Sprintf("SELECT id, name, description, price, image_file_name FROM product WHERE is_deleted = false %s LIMIT $1 OFFSET $2", orderQuery)
+	rows, err := repo.db.QueryContext(ctx, baseQuery, pagination.ItemPerPage, offset)
 	if err != nil {
 		return nil, nil, err
 	}

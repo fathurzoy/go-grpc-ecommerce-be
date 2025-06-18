@@ -23,6 +23,7 @@ type IProductService interface {
 	EditProduct(ctx context.Context, request *product.EditProductRequest) (*product.EditProductResponse, error)
 	DeleteProduct(ctx context.Context, request *product.DeleteProductRequest) (*product.DeleteProductResponse, error)
 	ListProduct(ctx context.Context, request *product.ListProductRequest) (*product.ListProductResponse, error)
+	ListProductAdmin(ctx context.Context, request *product.ListProductAdminRequest) (*product.ListProductAdminResponse, error)
 }
 
 type productService struct {
@@ -236,6 +237,48 @@ func (ps *productService) ListProduct(ctx context.Context, request *product.List
 	}
 
 	return &product.ListProductResponse{
+		Base:       utils.SuccessResponse("Get product success"),
+		Data:       data,
+		Pagination: paginationResponse,
+	}, nil
+}
+
+func (ps *productService) ListProductAdmin(ctx context.Context, request *product.ListProductAdminRequest) (*product.ListProductAdminResponse, error) {
+	// cek apakah user admin
+	claims, err := jwtentity.GetClaimsFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if claims.Role != entity.UserRoleAdmin {
+		return nil, utils.UnauthenticatedResponse()
+	}
+
+	//buat default request pagination
+	if request.Pagination == nil {
+		request.Pagination = &common.PaginationRequest{
+			CurrentPage: 1,
+			ItemPerPage: 10,
+		}
+	}
+
+	products, paginationResponse, err := ps.productRepository.GetProductPagination(ctx, request.Pagination)
+	if err != nil {
+		return nil, err
+	}
+
+	var data []*product.ListProductAdminResponseItem = make([]*product.ListProductAdminResponseItem, 0)
+	for _, v := range products {
+		data = append(data, &product.ListProductAdminResponseItem{
+			Id:          v.Id,
+			Name:        v.Name,
+			Description: v.Description,
+			Price:       v.Price,
+			ImageUrl:    fmt.Sprintf("%s/product/%s", os.Getenv("STORAGE_SERVICE_URL"), v.ImageFileName),
+		})
+	}
+
+	return &product.ListProductAdminResponse{
 		Base:       utils.SuccessResponse("Get product success"),
 		Data:       data,
 		Pagination: paginationResponse,
