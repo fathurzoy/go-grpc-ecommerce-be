@@ -65,7 +65,7 @@ func (os *orderService) CreateOrder(ctx context.Context, request *order.CreateOr
 	orderEntity := entity.Order{
 		Id: uuid.NewString(),
 		//  ORD-(YEAR)(NUMBER-7) ORD-20251111111
-		Number:          fmt.Sprintf("ORD-%d%08d", now.Year(), numbering),
+		Number:          fmt.Sprintf("ORD-%d%08d", now.Year(), numbering.Number),
 		UserId:          claims.Subject,
 		OrderStatusCode: entity.OrderStatusCodeUnpaid,
 		UserFullName:    request.FullName,
