@@ -70,7 +70,7 @@ func (or *orderRepository) CreateOrder(ctx context.Context, order *entity.Order)
 
 	_, err := or.db.ExecContext(
 		ctx,
-		"INSERT INTO \"order\" (id, number, user_id, order_status_code, user_full_name, address, phone_number, notes, total, expired_at, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by, is_deleted) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)",
+		"INSERT INTO \"order\" (id, number, user_id, order_status_code, user_full_name, address, phone_number, notes, total, expired_at, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by, is_deleted, xendit_invoice_id, xendit_invoice_url) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)",
 		order.Id,
 		order.Number,
 		order.UserId,
@@ -88,6 +88,8 @@ func (or *orderRepository) CreateOrder(ctx context.Context, order *entity.Order)
 		order.DeletedAt,
 		order.DeletedBy,
 		order.IsDeleted,
+		order.XenditInvoiceId,
+		order.XenditInvoiceUrl,
 	)
 	if err != nil {
 		return err

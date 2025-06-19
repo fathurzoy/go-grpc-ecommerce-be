@@ -15,6 +15,7 @@ import (
 	"github.com/fathurzoy/go-grpc-ecommerce-be/pb/cart"
 	"github.com/fathurzoy/go-grpc-ecommerce-be/pb/order"
 	"github.com/fathurzoy/go-grpc-ecommerce-be/pb/product"
+	"github.com/xendit/xendit-go"
 
 	// "github.com/fathurzoy/go-grpc-ecommerce-be/pb/service"
 	"github.com/fathurzoy/go-grpc-ecommerce-be/pkg/database"
@@ -27,6 +28,8 @@ import (
 func main() {
 	ctx := context.Background()
 	godotenv.Load()
+
+	xendit.Opt.SecretKey = os.Getenv("XENDIT_SECRET_KEY")
 
 	lis, err := net.Listen("tcp", "127.0.0.1:50051")
 	if err != nil {
