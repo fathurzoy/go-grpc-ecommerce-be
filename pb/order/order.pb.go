@@ -11,6 +11,7 @@ import (
 	common "github.com/fathurzoy/go-grpc-ecommerce-be/pb/common"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -26,7 +27,7 @@ const (
 type CreateOrderRequestProductItem struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Quantity      int32                  `protobuf:"varint,2,opt,name=quantity,proto3" json:"quantity,omitempty"`
+	Quantity      int64                  `protobuf:"varint,2,opt,name=quantity,proto3" json:"quantity,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -68,7 +69,7 @@ func (x *CreateOrderRequestProductItem) GetId() string {
 	return ""
 }
 
-func (x *CreateOrderRequestProductItem) GetQuantity() int32 {
+func (x *CreateOrderRequestProductItem) GetQuantity() int64 {
 	if x != nil {
 		return x.Quantity
 	}
@@ -203,14 +204,278 @@ func (x *CreateOrderResponse) GetId() string {
 	return ""
 }
 
+type ListOrderAdminRequest struct {
+	state         protoimpl.MessageState    `protogen:"open.v1"`
+	Pagination    *common.PaginationRequest `protobuf:"bytes,1,opt,name=pagination,proto3" json:"pagination,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListOrderAdminRequest) Reset() {
+	*x = ListOrderAdminRequest{}
+	mi := &file_order_order_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListOrderAdminRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListOrderAdminRequest) ProtoMessage() {}
+
+func (x *ListOrderAdminRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_order_order_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListOrderAdminRequest.ProtoReflect.Descriptor instead.
+func (*ListOrderAdminRequest) Descriptor() ([]byte, []int) {
+	return file_order_order_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *ListOrderAdminRequest) GetPagination() *common.PaginationRequest {
+	if x != nil {
+		return x.Pagination
+	}
+	return nil
+}
+
+type ListOrderAdminResponseItemProduct struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Price         float64                `protobuf:"fixed64,3,opt,name=price,proto3" json:"price,omitempty"`
+	Quantity      int64                  `protobuf:"varint,4,opt,name=quantity,proto3" json:"quantity,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListOrderAdminResponseItemProduct) Reset() {
+	*x = ListOrderAdminResponseItemProduct{}
+	mi := &file_order_order_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListOrderAdminResponseItemProduct) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListOrderAdminResponseItemProduct) ProtoMessage() {}
+
+func (x *ListOrderAdminResponseItemProduct) ProtoReflect() protoreflect.Message {
+	mi := &file_order_order_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListOrderAdminResponseItemProduct.ProtoReflect.Descriptor instead.
+func (*ListOrderAdminResponseItemProduct) Descriptor() ([]byte, []int) {
+	return file_order_order_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *ListOrderAdminResponseItemProduct) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *ListOrderAdminResponseItemProduct) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *ListOrderAdminResponseItemProduct) GetPrice() float64 {
+	if x != nil {
+		return x.Price
+	}
+	return 0
+}
+
+func (x *ListOrderAdminResponseItemProduct) GetQuantity() int64 {
+	if x != nil {
+		return x.Quantity
+	}
+	return 0
+}
+
+type ListOrderAdminResponseItem struct {
+	state         protoimpl.MessageState               `protogen:"open.v1"`
+	Id            string                               `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Number        string                               `protobuf:"bytes,2,opt,name=number,proto3" json:"number,omitempty"`
+	Customer      string                               `protobuf:"bytes,3,opt,name=customer,proto3" json:"customer,omitempty"`
+	StatusCode    string                               `protobuf:"bytes,4,opt,name=status_code,json=statusCode,proto3" json:"status_code,omitempty"`
+	Total         float64                              `protobuf:"fixed64,5,opt,name=total,proto3" json:"total,omitempty"`
+	CreatedAt     *timestamppb.Timestamp               `protobuf:"bytes,6,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	Products      []*ListOrderAdminResponseItemProduct `protobuf:"bytes,7,rep,name=products,proto3" json:"products,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListOrderAdminResponseItem) Reset() {
+	*x = ListOrderAdminResponseItem{}
+	mi := &file_order_order_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListOrderAdminResponseItem) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListOrderAdminResponseItem) ProtoMessage() {}
+
+func (x *ListOrderAdminResponseItem) ProtoReflect() protoreflect.Message {
+	mi := &file_order_order_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListOrderAdminResponseItem.ProtoReflect.Descriptor instead.
+func (*ListOrderAdminResponseItem) Descriptor() ([]byte, []int) {
+	return file_order_order_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *ListOrderAdminResponseItem) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *ListOrderAdminResponseItem) GetNumber() string {
+	if x != nil {
+		return x.Number
+	}
+	return ""
+}
+
+func (x *ListOrderAdminResponseItem) GetCustomer() string {
+	if x != nil {
+		return x.Customer
+	}
+	return ""
+}
+
+func (x *ListOrderAdminResponseItem) GetStatusCode() string {
+	if x != nil {
+		return x.StatusCode
+	}
+	return ""
+}
+
+func (x *ListOrderAdminResponseItem) GetTotal() float64 {
+	if x != nil {
+		return x.Total
+	}
+	return 0
+}
+
+func (x *ListOrderAdminResponseItem) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
+func (x *ListOrderAdminResponseItem) GetProducts() []*ListOrderAdminResponseItemProduct {
+	if x != nil {
+		return x.Products
+	}
+	return nil
+}
+
+type ListOrderAdminResponse struct {
+	state         protoimpl.MessageState        `protogen:"open.v1"`
+	Base          *common.BaseResponse          `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	Pagination    *common.PaginationResponse    `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
+	Items         []*ListOrderAdminResponseItem `protobuf:"bytes,3,rep,name=items,proto3" json:"items,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListOrderAdminResponse) Reset() {
+	*x = ListOrderAdminResponse{}
+	mi := &file_order_order_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListOrderAdminResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListOrderAdminResponse) ProtoMessage() {}
+
+func (x *ListOrderAdminResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_order_order_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListOrderAdminResponse.ProtoReflect.Descriptor instead.
+func (*ListOrderAdminResponse) Descriptor() ([]byte, []int) {
+	return file_order_order_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *ListOrderAdminResponse) GetBase() *common.BaseResponse {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *ListOrderAdminResponse) GetPagination() *common.PaginationResponse {
+	if x != nil {
+		return x.Pagination
+	}
+	return nil
+}
+
+func (x *ListOrderAdminResponse) GetItems() []*ListOrderAdminResponseItem {
+	if x != nil {
+		return x.Items
+	}
+	return nil
+}
+
 var File_order_order_proto protoreflect.FileDescriptor
 
 const file_order_order_proto_rawDesc = "" +
 	"\n" +
-	"\x11order/order.proto\x12\x05order\x1a\x1bbuf/validate/validate.proto\x1a\x1acommon/base_response.proto\"K\n" +
+	"\x11order/order.proto\x12\x05order\x1a\x1bbuf/validate/validate.proto\x1a\x1acommon/base_response.proto\x1a\x17common/pagination.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"K\n" +
 	"\x1dCreateOrderRequestProductItem\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
-	"\bquantity\x18\x02 \x01(\x05R\bquantity\"\xf4\x01\n" +
+	"\bquantity\x18\x02 \x01(\x03R\bquantity\"\xf4\x01\n" +
 	"\x12CreateOrderRequest\x12'\n" +
 	"\tfull_name\x18\x01 \x01(\tB\n" +
 	"\xbaH\ar\x05\x10\x01\x18\xff\x01R\bfullName\x12$\n" +
@@ -222,9 +487,35 @@ const file_order_order_proto_rawDesc = "" +
 	"\bproducts\x18\x05 \x03(\v2$.order.CreateOrderRequestProductItemR\bproducts\"O\n" +
 	"\x13CreateOrderResponse\x12(\n" +
 	"\x04base\x18\x01 \x01(\v2\x14.common.BaseResponseR\x04base\x12\x0e\n" +
-	"\x02id\x18\x02 \x01(\tR\x02id2T\n" +
+	"\x02id\x18\x02 \x01(\tR\x02id\"R\n" +
+	"\x15ListOrderAdminRequest\x129\n" +
+	"\n" +
+	"pagination\x18\x01 \x01(\v2\x19.common.PaginationRequestR\n" +
+	"pagination\"y\n" +
+	"!ListOrderAdminResponseItemProduct\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x14\n" +
+	"\x05price\x18\x03 \x01(\x01R\x05price\x12\x1a\n" +
+	"\bquantity\x18\x04 \x01(\x03R\bquantity\"\x98\x02\n" +
+	"\x1aListOrderAdminResponseItem\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x16\n" +
+	"\x06number\x18\x02 \x01(\tR\x06number\x12\x1a\n" +
+	"\bcustomer\x18\x03 \x01(\tR\bcustomer\x12\x1f\n" +
+	"\vstatus_code\x18\x04 \x01(\tR\n" +
+	"statusCode\x12\x14\n" +
+	"\x05total\x18\x05 \x01(\x01R\x05total\x129\n" +
+	"\n" +
+	"created_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x12D\n" +
+	"\bproducts\x18\a \x03(\v2(.order.ListOrderAdminResponseItemProductR\bproducts\"\xb7\x01\n" +
+	"\x16ListOrderAdminResponse\x12(\n" +
+	"\x04base\x18\x01 \x01(\v2\x14.common.BaseResponseR\x04base\x12:\n" +
+	"\n" +
+	"pagination\x18\x02 \x01(\v2\x1a.common.PaginationResponseR\n" +
+	"pagination\x127\n" +
+	"\x05items\x18\x03 \x03(\v2!.order.ListOrderAdminResponseItemR\x05items2\xa3\x01\n" +
 	"\fOrderService\x12D\n" +
-	"\vCreateOrder\x12\x19.order.CreateOrderRequest\x1a\x1a.order.CreateOrderResponseB4Z2github.com/fathurzoy/go-grpc-ecommerce-be/pb/orderb\x06proto3"
+	"\vCreateOrder\x12\x19.order.CreateOrderRequest\x1a\x1a.order.CreateOrderResponse\x12M\n" +
+	"\x0eListOrderAdmin\x12\x1c.order.ListOrderAdminRequest\x1a\x1d.order.ListOrderAdminResponseB4Z2github.com/fathurzoy/go-grpc-ecommerce-be/pb/orderb\x06proto3"
 
 var (
 	file_order_order_proto_rawDescOnce sync.Once
@@ -238,23 +529,38 @@ func file_order_order_proto_rawDescGZIP() []byte {
 	return file_order_order_proto_rawDescData
 }
 
-var file_order_order_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_order_order_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_order_order_proto_goTypes = []any{
-	(*CreateOrderRequestProductItem)(nil), // 0: order.CreateOrderRequestProductItem
-	(*CreateOrderRequest)(nil),            // 1: order.CreateOrderRequest
-	(*CreateOrderResponse)(nil),           // 2: order.CreateOrderResponse
-	(*common.BaseResponse)(nil),           // 3: common.BaseResponse
+	(*CreateOrderRequestProductItem)(nil),     // 0: order.CreateOrderRequestProductItem
+	(*CreateOrderRequest)(nil),                // 1: order.CreateOrderRequest
+	(*CreateOrderResponse)(nil),               // 2: order.CreateOrderResponse
+	(*ListOrderAdminRequest)(nil),             // 3: order.ListOrderAdminRequest
+	(*ListOrderAdminResponseItemProduct)(nil), // 4: order.ListOrderAdminResponseItemProduct
+	(*ListOrderAdminResponseItem)(nil),        // 5: order.ListOrderAdminResponseItem
+	(*ListOrderAdminResponse)(nil),            // 6: order.ListOrderAdminResponse
+	(*common.BaseResponse)(nil),               // 7: common.BaseResponse
+	(*common.PaginationRequest)(nil),          // 8: common.PaginationRequest
+	(*timestamppb.Timestamp)(nil),             // 9: google.protobuf.Timestamp
+	(*common.PaginationResponse)(nil),         // 10: common.PaginationResponse
 }
 var file_order_order_proto_depIdxs = []int32{
-	0, // 0: order.CreateOrderRequest.products:type_name -> order.CreateOrderRequestProductItem
-	3, // 1: order.CreateOrderResponse.base:type_name -> common.BaseResponse
-	1, // 2: order.OrderService.CreateOrder:input_type -> order.CreateOrderRequest
-	2, // 3: order.OrderService.CreateOrder:output_type -> order.CreateOrderResponse
-	3, // [3:4] is the sub-list for method output_type
-	2, // [2:3] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	0,  // 0: order.CreateOrderRequest.products:type_name -> order.CreateOrderRequestProductItem
+	7,  // 1: order.CreateOrderResponse.base:type_name -> common.BaseResponse
+	8,  // 2: order.ListOrderAdminRequest.pagination:type_name -> common.PaginationRequest
+	9,  // 3: order.ListOrderAdminResponseItem.created_at:type_name -> google.protobuf.Timestamp
+	4,  // 4: order.ListOrderAdminResponseItem.products:type_name -> order.ListOrderAdminResponseItemProduct
+	7,  // 5: order.ListOrderAdminResponse.base:type_name -> common.BaseResponse
+	10, // 6: order.ListOrderAdminResponse.pagination:type_name -> common.PaginationResponse
+	5,  // 7: order.ListOrderAdminResponse.items:type_name -> order.ListOrderAdminResponseItem
+	1,  // 8: order.OrderService.CreateOrder:input_type -> order.CreateOrderRequest
+	3,  // 9: order.OrderService.ListOrderAdmin:input_type -> order.ListOrderAdminRequest
+	2,  // 10: order.OrderService.CreateOrder:output_type -> order.CreateOrderResponse
+	6,  // 11: order.OrderService.ListOrderAdmin:output_type -> order.ListOrderAdminResponse
+	10, // [10:12] is the sub-list for method output_type
+	8,  // [8:10] is the sub-list for method input_type
+	8,  // [8:8] is the sub-list for extension type_name
+	8,  // [8:8] is the sub-list for extension extendee
+	0,  // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_order_order_proto_init() }
@@ -268,7 +574,7 @@ func file_order_order_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_order_order_proto_rawDesc), len(file_order_order_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   3,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -4,8 +4,11 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
+	"strings"
 
 	"github.com/fathurzoy/go-grpc-ecommerce-be/internal/entity"
+	"github.com/fathurzoy/go-grpc-ecommerce-be/pb/common"
 	"github.com/fathurzoy/go-grpc-ecommerce-be/pkg/database"
 )
 
@@ -17,6 +20,7 @@ type IOrderRepository interface {
 	CreateOrderItem(ctx context.Context, orderItem *entity.OrderItem) error
 	GetOrderById(ctx context.Context, orderId string) (*entity.Order, error)
 	UpdateOrder(ctx context.Context, order *entity.Order) error
+	GetListOrderAdminPagination(ctx context.Context, pagination *common.PaginationRequest) ([]*entity.Order, *common.PaginationResponse, error)
 }
 
 type orderRepository struct {
@@ -179,6 +183,116 @@ func (or *orderRepository) UpdateOrder(ctx context.Context, order *entity.Order)
 	}
 
 	return nil
+}
+
+func (or *orderRepository) GetListOrderAdminPagination(ctx context.Context, pagination *common.PaginationRequest) ([]*entity.Order, *common.PaginationResponse, error) {
+	// TODO: implement
+
+	row := or.db.QueryRowContext(ctx, "SELECT COUNT(*) FROM \"order\" WHERE is_deleted = false")
+	if row.Err() != nil {
+		return nil, nil, row.Err()
+	}
+
+	var totalCount int
+	err := row.Scan(&totalCount)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	offset := (pagination.CurrentPage - 1) * pagination.ItemPerPage
+
+	// Hitung total halaman
+	totalPages := (totalCount + int(pagination.ItemPerPage) - 1) / int(pagination.ItemPerPage)
+
+	allowedSorts := map[string]string{
+		"number":        "number",
+		"customer_name": "user_full_name",
+		"total":         "total",
+		"created_at":    "created_at",
+	}
+	sort := "ORDER BY created_at DESC"
+	if pagination.Sort != nil {
+		direction := "ASC"
+		sortField, ok := allowedSorts[pagination.Sort.Field]
+		if ok {
+			if pagination.Sort.Direction == "desc" {
+				direction = "DESC"
+			}
+			sort = fmt.Sprintf("ORDER BY %s %s", sortField, direction)
+		}
+	}
+
+	baseQuery := fmt.Sprintf("SELECT id, number, order_status_code, total, user_full_name, created_at, expired_at FROM \"order\" WHERE is_deleted = false %s limit $1 offset $2", sort)
+	rows, err := or.db.QueryContext(
+		ctx,
+		baseQuery,
+		pagination.ItemPerPage,
+		offset,
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	orders := make([]*entity.Order, 0)
+	ids := make([]string, 0)
+	orderItemsMap := make(map[string][]*entity.OrderItem)
+	for rows.Next() {
+		var orderEntity entity.Order
+		err := rows.Scan(
+			&orderEntity.Id,
+			&orderEntity.Number,
+			&orderEntity.OrderStatusCode,
+			&orderEntity.Total,
+			&orderEntity.UserFullName,
+			&orderEntity.CreatedAt,
+			&orderEntity.ExpiredAt,
+		)
+		if err != nil {
+			return nil, nil, err
+		}
+
+		orders = append(orders, &orderEntity)
+		ids = append(ids, fmt.Sprintf("'%s'", orderEntity.Id))
+		orderItemsMap[orderEntity.Id] = make([]*entity.OrderItem, 0)
+	}
+
+	idsJoined := strings.Join(ids, ",")
+	baseOrderItemQuery := fmt.Sprintf("SELECT product_id, product_name, product_price, quantity, order_id FROM \"order\" WHERE is_deleted = false AND order_id IN %s", idsJoined)
+	rows, err = or.db.QueryContext(
+		ctx,
+		baseOrderItemQuery,
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	for rows.Next() {
+		var orderItem entity.OrderItem
+		err := rows.Scan(
+			&orderItem.ProductId,
+			&orderItem.ProductName,
+			&orderItem.ProductPrice,
+			&orderItem.Quantity,
+			&orderItem.OrderId,
+		)
+		if err != nil {
+			return nil, nil, err
+		}
+
+		orderItemsMap[orderItem.OrderId] = append(orderItemsMap[orderItem.OrderId], &orderItem)
+	}
+
+	for i, o := range orders {
+		orders[i].Items = orderItemsMap[o.Id]
+	}
+
+	var metadata common.PaginationResponse = common.PaginationResponse{
+		TotalItemCount: int32(totalCount),
+		TotalPageCount: int32(totalPages),
+		CurrentPage:    pagination.CurrentPage,
+		ItemPerPage:    pagination.ItemPerPage,
+	}
+	return orders, &metadata, nil
 }
 
 func NewOrderRepository(db database.DatabaseQuery) IOrderRepository {

@@ -34,6 +34,8 @@ type Order struct {
 	XenditPaidAt         *time.Time
 	XenditPaymentMethod  *string
 	XenditPaymentChannel *string
+
+	Items []*OrderItem
 }
 
 type OrderItem struct {
@@ -42,7 +44,7 @@ type OrderItem struct {
 	ProductName          string
 	ProductImageFileName string
 	ProductPrice         float64
-	Quantity             int32
+	Quantity             int64
 	OrderId              string
 	CreatedAt            time.Time
 	CreatedBy            string

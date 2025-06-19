@@ -17,10 +17,12 @@ import (
 	"github.com/google/uuid"
 	"github.com/xendit/xendit-go"
 	"github.com/xendit/xendit-go/invoice"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type IOrderService interface {
 	CreateOrder(ctx context.Context, request *order.CreateOrderRequest) (*order.CreateOrderResponse, error)
+	ListOrderAdmin(ctx context.Context, request *order.ListOrderAdminRequest) (*order.ListOrderAdminResponse, error)
 }
 
 type orderService struct {
@@ -179,6 +181,58 @@ func (os *orderService) CreateOrder(ctx context.Context, request *order.CreateOr
 		Id:   orderEntity.Id,
 		Base: utils.SuccessResponse("Create order success"),
 	}, nil
+}
+
+func (os *orderService) ListOrderAdmin(ctx context.Context, request *order.ListOrderAdminRequest) (*order.ListOrderAdminResponse, error) {
+	claims, err := jwtentity.GetClaimsFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if claims.Role != entity.UserRoleAdmin {
+		return nil, utils.UnauthenticatedResponse()
+	}
+
+	orders, metadata, err := os.orderRepository.GetListOrderAdminPagination(ctx, request.Pagination)
+	if err != nil {
+		return nil, err
+	}
+
+	items := make([]*order.ListOrderAdminResponseItem, 0)
+	for _, orderEntity := range orders {
+
+		products := make([]*order.ListOrderAdminResponseItemProduct, 0)
+
+		for _, oi := range orderEntity.Items {
+			products = append(products, &order.ListOrderAdminResponseItemProduct{
+				Id:       oi.Id,
+				Name:     oi.ProductName,
+				Quantity: oi.Quantity,
+				Price:    oi.ProductPrice,
+			})
+		}
+
+		orderStatusCode := orderEntity.OrderStatusCode
+		if orderEntity.OrderStatusCode == entity.OrderStatusCodeUnpaid && time.Now().After(*orderEntity.ExpiredAt) {
+			orderEntity.OrderStatusCode = entity.OrderStatusCodeExpired
+		}
+
+		items = append(items, &order.ListOrderAdminResponseItem{
+			Id:         orderEntity.Id,
+			Number:     orderEntity.Number,
+			Customer:   orderEntity.UserFullName,
+			StatusCode: orderStatusCode,
+			Total:      orderEntity.Total,
+			CreatedAt:  timestamppb.New(orderEntity.CreatedAt),
+			Products:   products,
+		})
+	}
+
+	return &order.ListOrderAdminResponse{
+		Base:       utils.SuccessResponse("List order success"),
+		Pagination: metadata,
+		Items:      items,
+	}, nil //.nil, nil
 }
 
 func NewOrderService(db *sql.DB, orderRepository repository.IOrderRepository, productRepository repository.IProductRepository) IOrderService {
