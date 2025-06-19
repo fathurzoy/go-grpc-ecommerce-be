@@ -76,6 +76,27 @@ func (oh *orderHandler) ListOrder(ctx context.Context, request *order.ListOrderR
 	return res, nil
 }
 
+func (oh *orderHandler) DetailOrder(ctx context.Context, request *order.DetailOrderRequest) (*order.DetailOrderResponse, error) {
+	validationErrors, err := utils.CheckValidation(request)
+	if err != nil {
+		return nil, err
+	}
+
+	if validationErrors != nil {
+		return &order.DetailOrderResponse{
+			Base: utils.ValidationErrorResponse(validationErrors),
+		}, nil
+	}
+
+	// Proccess
+	res, err := oh.orderService.DetailOrder(ctx, request)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
 func NewOrderHandler(orderService service.IOrderService) *orderHandler {
 	return &orderHandler{
 		orderService: orderService,

@@ -740,6 +740,258 @@ func (x *ListOrderResponse) GetItems() []*ListOrderResponseItem {
 	return nil
 }
 
+type DetailOrderRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DetailOrderRequest) Reset() {
+	*x = DetailOrderRequest{}
+	mi := &file_order_order_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DetailOrderRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DetailOrderRequest) ProtoMessage() {}
+
+func (x *DetailOrderRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_order_order_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DetailOrderRequest.ProtoReflect.Descriptor instead.
+func (*DetailOrderRequest) Descriptor() ([]byte, []int) {
+	return file_order_order_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *DetailOrderRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type DetailOrderResponseItemProduct struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Price         float64                `protobuf:"fixed64,3,opt,name=price,proto3" json:"price,omitempty"`
+	Quantity      int64                  `protobuf:"varint,4,opt,name=quantity,proto3" json:"quantity,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DetailOrderResponseItemProduct) Reset() {
+	*x = DetailOrderResponseItemProduct{}
+	mi := &file_order_order_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DetailOrderResponseItemProduct) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DetailOrderResponseItemProduct) ProtoMessage() {}
+
+func (x *DetailOrderResponseItemProduct) ProtoReflect() protoreflect.Message {
+	mi := &file_order_order_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DetailOrderResponseItemProduct.ProtoReflect.Descriptor instead.
+func (*DetailOrderResponseItemProduct) Descriptor() ([]byte, []int) {
+	return file_order_order_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *DetailOrderResponseItemProduct) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *DetailOrderResponseItemProduct) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *DetailOrderResponseItemProduct) GetPrice() float64 {
+	if x != nil {
+		return x.Price
+	}
+	return 0
+}
+
+func (x *DetailOrderResponseItemProduct) GetQuantity() int64 {
+	if x != nil {
+		return x.Quantity
+	}
+	return 0
+}
+
+type DetailOrderResponse struct {
+	state            protoimpl.MessageState            `protogen:"open.v1"`
+	Base             *common.BaseResponse              `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	Id               string                            `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	Number           string                            `protobuf:"bytes,3,opt,name=number,proto3" json:"number,omitempty"`
+	UserFullName     string                            `protobuf:"bytes,4,opt,name=user_full_name,json=userFullName,proto3" json:"user_full_name,omitempty"`
+	Address          string                            `protobuf:"bytes,5,opt,name=address,proto3" json:"address,omitempty"`
+	PhoneNumber      string                            `protobuf:"bytes,6,opt,name=phone_number,json=phoneNumber,proto3" json:"phone_number,omitempty"`
+	Notes            string                            `protobuf:"bytes,7,opt,name=notes,proto3" json:"notes,omitempty"`
+	OrderStatusCode  string                            `protobuf:"bytes,8,opt,name=order_status_code,json=orderStatusCode,proto3" json:"order_status_code,omitempty"`
+	CreatedAt        *timestamppb.Timestamp            `protobuf:"bytes,9,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	XenditInvoiceUrl string                            `protobuf:"bytes,10,opt,name=xendit_invoice_url,json=xenditInvoiceUrl,proto3" json:"xendit_invoice_url,omitempty"`
+	Items            []*DetailOrderResponseItemProduct `protobuf:"bytes,11,rep,name=items,proto3" json:"items,omitempty"`
+	Total            float64                           `protobuf:"fixed64,12,opt,name=total,proto3" json:"total,omitempty"`
+	ExpiredAt        *timestamppb.Timestamp            `protobuf:"bytes,13,opt,name=expired_at,json=expiredAt,proto3" json:"expired_at,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *DetailOrderResponse) Reset() {
+	*x = DetailOrderResponse{}
+	mi := &file_order_order_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DetailOrderResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DetailOrderResponse) ProtoMessage() {}
+
+func (x *DetailOrderResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_order_order_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DetailOrderResponse.ProtoReflect.Descriptor instead.
+func (*DetailOrderResponse) Descriptor() ([]byte, []int) {
+	return file_order_order_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *DetailOrderResponse) GetBase() *common.BaseResponse {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *DetailOrderResponse) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *DetailOrderResponse) GetNumber() string {
+	if x != nil {
+		return x.Number
+	}
+	return ""
+}
+
+func (x *DetailOrderResponse) GetUserFullName() string {
+	if x != nil {
+		return x.UserFullName
+	}
+	return ""
+}
+
+func (x *DetailOrderResponse) GetAddress() string {
+	if x != nil {
+		return x.Address
+	}
+	return ""
+}
+
+func (x *DetailOrderResponse) GetPhoneNumber() string {
+	if x != nil {
+		return x.PhoneNumber
+	}
+	return ""
+}
+
+func (x *DetailOrderResponse) GetNotes() string {
+	if x != nil {
+		return x.Notes
+	}
+	return ""
+}
+
+func (x *DetailOrderResponse) GetOrderStatusCode() string {
+	if x != nil {
+		return x.OrderStatusCode
+	}
+	return ""
+}
+
+func (x *DetailOrderResponse) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
+func (x *DetailOrderResponse) GetXenditInvoiceUrl() string {
+	if x != nil {
+		return x.XenditInvoiceUrl
+	}
+	return ""
+}
+
+func (x *DetailOrderResponse) GetItems() []*DetailOrderResponseItemProduct {
+	if x != nil {
+		return x.Items
+	}
+	return nil
+}
+
+func (x *DetailOrderResponse) GetTotal() float64 {
+	if x != nil {
+		return x.Total
+	}
+	return 0
+}
+
+func (x *DetailOrderResponse) GetExpiredAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.ExpiredAt
+	}
+	return nil
+}
+
 var File_order_order_proto protoreflect.FileDescriptor
 
 const file_order_order_proto_rawDesc = "" +
@@ -810,11 +1062,37 @@ const file_order_order_proto_rawDesc = "" +
 	"\n" +
 	"pagination\x18\x02 \x01(\v2\x1a.common.PaginationResponseR\n" +
 	"pagination\x122\n" +
-	"\x05items\x18\x03 \x03(\v2\x1c.order.ListOrderResponseItemR\x05items2\xe3\x01\n" +
+	"\x05items\x18\x03 \x03(\v2\x1c.order.ListOrderResponseItemR\x05items\"0\n" +
+	"\x12DetailOrderRequest\x12\x1a\n" +
+	"\x02id\x18\x01 \x01(\tB\n" +
+	"\xbaH\ar\x05\x10\x01\x18\xff\x01R\x02id\"v\n" +
+	"\x1eDetailOrderResponseItemProduct\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x14\n" +
+	"\x05price\x18\x03 \x01(\x01R\x05price\x12\x1a\n" +
+	"\bquantity\x18\x04 \x01(\x03R\bquantity\"\x83\x04\n" +
+	"\x13DetailOrderResponse\x12(\n" +
+	"\x04base\x18\x01 \x01(\v2\x14.common.BaseResponseR\x04base\x12\x0e\n" +
+	"\x02id\x18\x02 \x01(\tR\x02id\x12\x16\n" +
+	"\x06number\x18\x03 \x01(\tR\x06number\x12$\n" +
+	"\x0euser_full_name\x18\x04 \x01(\tR\fuserFullName\x12\x18\n" +
+	"\aaddress\x18\x05 \x01(\tR\aaddress\x12!\n" +
+	"\fphone_number\x18\x06 \x01(\tR\vphoneNumber\x12\x14\n" +
+	"\x05notes\x18\a \x01(\tR\x05notes\x12*\n" +
+	"\x11order_status_code\x18\b \x01(\tR\x0forderStatusCode\x129\n" +
+	"\n" +
+	"created_at\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x12,\n" +
+	"\x12xendit_invoice_url\x18\n" +
+	" \x01(\tR\x10xenditInvoiceUrl\x12;\n" +
+	"\x05items\x18\v \x03(\v2%.order.DetailOrderResponseItemProductR\x05items\x12\x14\n" +
+	"\x05total\x18\f \x01(\x01R\x05total\x129\n" +
+	"\n" +
+	"expired_at\x18\r \x01(\v2\x1a.google.protobuf.TimestampR\texpiredAt2\xa9\x02\n" +
 	"\fOrderService\x12D\n" +
 	"\vCreateOrder\x12\x19.order.CreateOrderRequest\x1a\x1a.order.CreateOrderResponse\x12M\n" +
 	"\x0eListOrderAdmin\x12\x1c.order.ListOrderAdminRequest\x1a\x1d.order.ListOrderAdminResponse\x12>\n" +
-	"\tListOrder\x12\x17.order.ListOrderRequest\x1a\x18.order.ListOrderResponseB4Z2github.com/fathurzoy/go-grpc-ecommerce-be/pb/orderb\x06proto3"
+	"\tListOrder\x12\x17.order.ListOrderRequest\x1a\x18.order.ListOrderResponse\x12D\n" +
+	"\vDetailOrder\x12\x19.order.DetailOrderRequest\x1a\x1a.order.DetailOrderResponseB4Z2github.com/fathurzoy/go-grpc-ecommerce-be/pb/orderb\x06proto3"
 
 var (
 	file_order_order_proto_rawDescOnce sync.Once
@@ -828,7 +1106,7 @@ func file_order_order_proto_rawDescGZIP() []byte {
 	return file_order_order_proto_rawDescData
 }
 
-var file_order_order_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_order_order_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
 var file_order_order_proto_goTypes = []any{
 	(*CreateOrderRequestProductItem)(nil),     // 0: order.CreateOrderRequestProductItem
 	(*CreateOrderRequest)(nil),                // 1: order.CreateOrderRequest
@@ -841,37 +1119,46 @@ var file_order_order_proto_goTypes = []any{
 	(*ListOrderResponseItemProduct)(nil),      // 8: order.ListOrderResponseItemProduct
 	(*ListOrderResponseItem)(nil),             // 9: order.ListOrderResponseItem
 	(*ListOrderResponse)(nil),                 // 10: order.ListOrderResponse
-	(*common.BaseResponse)(nil),               // 11: common.BaseResponse
-	(*common.PaginationRequest)(nil),          // 12: common.PaginationRequest
-	(*timestamppb.Timestamp)(nil),             // 13: google.protobuf.Timestamp
-	(*common.PaginationResponse)(nil),         // 14: common.PaginationResponse
+	(*DetailOrderRequest)(nil),                // 11: order.DetailOrderRequest
+	(*DetailOrderResponseItemProduct)(nil),    // 12: order.DetailOrderResponseItemProduct
+	(*DetailOrderResponse)(nil),               // 13: order.DetailOrderResponse
+	(*common.BaseResponse)(nil),               // 14: common.BaseResponse
+	(*common.PaginationRequest)(nil),          // 15: common.PaginationRequest
+	(*timestamppb.Timestamp)(nil),             // 16: google.protobuf.Timestamp
+	(*common.PaginationResponse)(nil),         // 17: common.PaginationResponse
 }
 var file_order_order_proto_depIdxs = []int32{
 	0,  // 0: order.CreateOrderRequest.products:type_name -> order.CreateOrderRequestProductItem
-	11, // 1: order.CreateOrderResponse.base:type_name -> common.BaseResponse
-	12, // 2: order.ListOrderAdminRequest.pagination:type_name -> common.PaginationRequest
-	13, // 3: order.ListOrderAdminResponseItem.created_at:type_name -> google.protobuf.Timestamp
+	14, // 1: order.CreateOrderResponse.base:type_name -> common.BaseResponse
+	15, // 2: order.ListOrderAdminRequest.pagination:type_name -> common.PaginationRequest
+	16, // 3: order.ListOrderAdminResponseItem.created_at:type_name -> google.protobuf.Timestamp
 	4,  // 4: order.ListOrderAdminResponseItem.products:type_name -> order.ListOrderAdminResponseItemProduct
-	11, // 5: order.ListOrderAdminResponse.base:type_name -> common.BaseResponse
-	14, // 6: order.ListOrderAdminResponse.pagination:type_name -> common.PaginationResponse
+	14, // 5: order.ListOrderAdminResponse.base:type_name -> common.BaseResponse
+	17, // 6: order.ListOrderAdminResponse.pagination:type_name -> common.PaginationResponse
 	5,  // 7: order.ListOrderAdminResponse.items:type_name -> order.ListOrderAdminResponseItem
-	12, // 8: order.ListOrderRequest.pagination:type_name -> common.PaginationRequest
-	13, // 9: order.ListOrderResponseItem.created_at:type_name -> google.protobuf.Timestamp
+	15, // 8: order.ListOrderRequest.pagination:type_name -> common.PaginationRequest
+	16, // 9: order.ListOrderResponseItem.created_at:type_name -> google.protobuf.Timestamp
 	8,  // 10: order.ListOrderResponseItem.products:type_name -> order.ListOrderResponseItemProduct
-	11, // 11: order.ListOrderResponse.base:type_name -> common.BaseResponse
-	14, // 12: order.ListOrderResponse.pagination:type_name -> common.PaginationResponse
+	14, // 11: order.ListOrderResponse.base:type_name -> common.BaseResponse
+	17, // 12: order.ListOrderResponse.pagination:type_name -> common.PaginationResponse
 	9,  // 13: order.ListOrderResponse.items:type_name -> order.ListOrderResponseItem
-	1,  // 14: order.OrderService.CreateOrder:input_type -> order.CreateOrderRequest
-	3,  // 15: order.OrderService.ListOrderAdmin:input_type -> order.ListOrderAdminRequest
-	7,  // 16: order.OrderService.ListOrder:input_type -> order.ListOrderRequest
-	2,  // 17: order.OrderService.CreateOrder:output_type -> order.CreateOrderResponse
-	6,  // 18: order.OrderService.ListOrderAdmin:output_type -> order.ListOrderAdminResponse
-	10, // 19: order.OrderService.ListOrder:output_type -> order.ListOrderResponse
-	17, // [17:20] is the sub-list for method output_type
-	14, // [14:17] is the sub-list for method input_type
-	14, // [14:14] is the sub-list for extension type_name
-	14, // [14:14] is the sub-list for extension extendee
-	0,  // [0:14] is the sub-list for field type_name
+	14, // 14: order.DetailOrderResponse.base:type_name -> common.BaseResponse
+	16, // 15: order.DetailOrderResponse.created_at:type_name -> google.protobuf.Timestamp
+	12, // 16: order.DetailOrderResponse.items:type_name -> order.DetailOrderResponseItemProduct
+	16, // 17: order.DetailOrderResponse.expired_at:type_name -> google.protobuf.Timestamp
+	1,  // 18: order.OrderService.CreateOrder:input_type -> order.CreateOrderRequest
+	3,  // 19: order.OrderService.ListOrderAdmin:input_type -> order.ListOrderAdminRequest
+	7,  // 20: order.OrderService.ListOrder:input_type -> order.ListOrderRequest
+	11, // 21: order.OrderService.DetailOrder:input_type -> order.DetailOrderRequest
+	2,  // 22: order.OrderService.CreateOrder:output_type -> order.CreateOrderResponse
+	6,  // 23: order.OrderService.ListOrderAdmin:output_type -> order.ListOrderAdminResponse
+	10, // 24: order.OrderService.ListOrder:output_type -> order.ListOrderResponse
+	13, // 25: order.OrderService.DetailOrder:output_type -> order.DetailOrderResponse
+	22, // [22:26] is the sub-list for method output_type
+	18, // [18:22] is the sub-list for method input_type
+	18, // [18:18] is the sub-list for extension type_name
+	18, // [18:18] is the sub-list for extension extendee
+	0,  // [0:18] is the sub-list for field type_name
 }
 
 func init() { file_order_order_proto_init() }
@@ -885,7 +1172,7 @@ func file_order_order_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_order_order_proto_rawDesc), len(file_order_order_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   11,
+			NumMessages:   14,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

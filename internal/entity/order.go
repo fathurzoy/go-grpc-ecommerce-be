@@ -19,7 +19,7 @@ type Order struct {
 	UserFullName         string
 	Address              string
 	PhoneNumber          string
-	Notes                string
+	Notes                *string
 	Total                float64
 	ExpiredAt            *time.Time
 	CreatedAt            time.Time

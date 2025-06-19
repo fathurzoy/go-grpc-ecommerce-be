@@ -13,6 +13,7 @@ service OrderService {
   rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse);
   rpc ListOrderAdmin(ListOrderAdminRequest) returns (ListOrderAdminResponse);
   rpc ListOrder(ListOrderRequest) returns (ListOrderResponse);
+  rpc DetailOrder(DetailOrderRequest) returns (DetailOrderResponse);
 }
 
 message CreateOrderRequestProductItem {
@@ -88,4 +89,32 @@ message ListOrderResponse {
   common.BaseResponse base = 1;
   common.PaginationResponse pagination = 2;
   repeated ListOrderResponseItem items = 3;
+}
+
+
+message DetailOrderRequest {
+  string id = 1 [(buf.validate.field).string = { min_len: 1 , max_len: 255}];
+}
+
+message DetailOrderResponseItemProduct {
+  string id = 1;
+  string name = 2;
+  double price = 3;
+  int64 quantity = 4;
+}
+
+message DetailOrderResponse {
+  common.BaseResponse base = 1;
+  string id = 2;
+  string number = 3;
+  string user_full_name = 4;
+  string address = 5;
+  string phone_number = 6;
+  string notes = 7;
+  string order_status_code = 8;
+  google.protobuf.Timestamp created_at = 9;
+  string xendit_invoice_url = 10;
+  repeated DetailOrderResponseItemProduct items = 11;
+  double total = 12;
+  google.protobuf.Timestamp expired_at = 13;
 }
