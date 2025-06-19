@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"mime"
 	"net/http"
@@ -8,8 +9,12 @@ import (
 	"path"
 
 	"github.com/fathurzoy/go-grpc-ecommerce-be/internal/handler"
+	"github.com/fathurzoy/go-grpc-ecommerce-be/internal/repository"
+	"github.com/fathurzoy/go-grpc-ecommerce-be/internal/service"
+	"github.com/fathurzoy/go-grpc-ecommerce-be/pkg/database"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/joho/godotenv"
 )
 
 func handleGetFileName(c *fiber.Ctx) error {
@@ -39,9 +44,14 @@ func handleGetFileName(c *fiber.Ctx) error {
 }
 
 func main() {
+	godotenv.Load()
+	ctx := context.Background()
 	app := fiber.New()
 
-	webhookHandler := handler.NewWebhookHandler()
+	db := database.ConnectDB(ctx, os.Getenv("DB_URI"))
+	orderRepository := repository.NewOrderRepository(db)
+	webhookSerivce := service.NewWebhookService(orderRepository)
+	webhookHandler := handler.NewWebhookHandler(webhookSerivce)
 
 	app.Use(cors.New())
 
