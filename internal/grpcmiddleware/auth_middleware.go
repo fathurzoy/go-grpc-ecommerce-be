@@ -15,11 +15,12 @@ type authMiddleware struct {
 }
 
 var publicApis = map[string]bool{
-	"/auth.AuthService/Login":                   true,
-	"/auth.AuthService/Register":                true,
-	"/product.ProductService/DetailProduct":     true,
-	"/product.ProductService/ListProduct":       true,
-	"/product.ProductSerivice/HighlightProduct": true,
+	"/auth.AuthService/Login":                           true,
+	"/auth.AuthService/Register":                        true,
+	"/product.ProductService/DetailProduct":             true,
+	"/product.ProductService/ListProduct":               true,
+	"/product.ProductSerivice/HighlightProduct":         true,
+	"/newsletter.NewsletterService/SubscribeNewsletter": true,
 }
 
 func (am *authMiddleware) Middleware(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp any, err error) {

@@ -13,6 +13,7 @@ import (
 	"github.com/fathurzoy/go-grpc-ecommerce-be/internal/service"
 	"github.com/fathurzoy/go-grpc-ecommerce-be/pb/auth"
 	"github.com/fathurzoy/go-grpc-ecommerce-be/pb/cart"
+	"github.com/fathurzoy/go-grpc-ecommerce-be/pb/newsletter"
 	"github.com/fathurzoy/go-grpc-ecommerce-be/pb/order"
 	"github.com/fathurzoy/go-grpc-ecommerce-be/pb/product"
 	"github.com/xendit/xendit-go"
@@ -61,12 +62,17 @@ func main() {
 	orderService := service.NewOrderService(db, orderRepository, productRepository)
 	orderHandler := handler.NewOrderHandler(orderService)
 
+	newsletterRepository := repository.NewNewsletterRepository(db)
+	newsletterService := service.NewNewsletterService(newsletterRepository)
+	newsletterHandler := handler.NewNewsletterHandler(newsletterService)
+
 	serv := grpc.NewServer(grpc.ChainUnaryInterceptor(grpcmiddleware.ErrorMiddleware, authMiddleware.Middleware))
 
 	auth.RegisterAuthServiceServer(serv, authHandler)
 	product.RegisterProductSeriviceServer(serv, productHandler)
 	cart.RegisterCartServiceServer(serv, cartHandler)
 	order.RegisterOrderServiceServer(serv, orderHandler)
+	newsletter.RegisterNewsletterServiceServer(serv, newsletterHandler)
 
 	// service.RegisterHelloWorldServiceServer(serv, serviceHandler)
 
