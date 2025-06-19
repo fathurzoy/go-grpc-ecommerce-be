@@ -14,6 +14,7 @@ service OrderService {
   rpc ListOrderAdmin(ListOrderAdminRequest) returns (ListOrderAdminResponse);
   rpc ListOrder(ListOrderRequest) returns (ListOrderResponse);
   rpc DetailOrder(DetailOrderRequest) returns (DetailOrderResponse);
+  rpc UpdateOrderStatus(UpdateOrderStatusRequest) returns (UpdateOrderStatusResponse);
 }
 
 message CreateOrderRequestProductItem {
@@ -117,4 +118,13 @@ message DetailOrderResponse {
   repeated DetailOrderResponseItemProduct items = 11;
   double total = 12;
   google.protobuf.Timestamp expired_at = 13;
+}
+
+message UpdateOrderStatusRequest {
+  string id = 1 [(buf.validate.field).string = { min_len: 1 , max_len: 255}];
+  string new_status_code = 2 [(buf.validate.field).string = { min_len: 1 , max_len: 255}];
+}
+
+message UpdateOrderStatusResponse {
+  common.BaseResponse base = 1;
 }

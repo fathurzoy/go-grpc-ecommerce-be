@@ -3,12 +3,12 @@ package entity
 import "time"
 
 const (
-	OrderStatusCodeUnpaid  = "unpaid"
-	OrderStatusCodePaid    = "paid"
-	OrderStatusCodeShipped = "shipped"
-	OrderStatusCodeCancel  = "cancel"
-	OrderStatusCodeDone    = "done"
-	OrderStatusCodeExpired = "expired"
+	OrderStatusCodeUnpaid   = "unpaid"
+	OrderStatusCodePaid     = "paid"
+	OrderStatusCodeShipped  = "shipped"
+	OrderStatusCodeCanceled = "canceled"
+	OrderStatusCodeDone     = "done"
+	OrderStatusCodeExpired  = "expired"
 )
 
 type Order struct {
