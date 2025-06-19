@@ -12,6 +12,7 @@ package order;
 service OrderService {
   rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse);
   rpc ListOrderAdmin(ListOrderAdminRequest) returns (ListOrderAdminResponse);
+  rpc ListOrder(ListOrderRequest) returns (ListOrderResponse);
 }
 
 message CreateOrderRequestProductItem {
@@ -57,4 +58,34 @@ message ListOrderAdminResponse {
   common.BaseResponse base = 1;
   common.PaginationResponse pagination = 2;
   repeated ListOrderAdminResponseItem items = 3;
+}
+
+
+
+message ListOrderRequest {
+  common.PaginationRequest pagination = 1;
+}
+
+message ListOrderResponseItemProduct {
+  string id = 1;
+  string name = 2;
+  double price = 3;
+  int64 quantity = 4;
+}
+
+message ListOrderResponseItem {
+  string id = 1;
+  string number = 2;
+  string customer = 3;
+  string status_code = 4;
+  double total = 5;
+  google.protobuf.Timestamp created_at = 6;
+  repeated ListOrderResponseItemProduct products = 7;
+  string xendit_invoice_url = 8;
+}
+
+message ListOrderResponse {
+  common.BaseResponse base = 1;
+  common.PaginationResponse pagination = 2;
+  repeated ListOrderResponseItem items = 3;
 }

@@ -23,6 +23,7 @@ import (
 type IOrderService interface {
 	CreateOrder(ctx context.Context, request *order.CreateOrderRequest) (*order.CreateOrderResponse, error)
 	ListOrderAdmin(ctx context.Context, request *order.ListOrderAdminRequest) (*order.ListOrderAdminResponse, error)
+	ListOrder(ctx context.Context, request *order.ListOrderRequest) (*order.ListOrderResponse, error)
 }
 
 type orderService struct {
@@ -229,6 +230,59 @@ func (os *orderService) ListOrderAdmin(ctx context.Context, request *order.ListO
 	}
 
 	return &order.ListOrderAdminResponse{
+		Base:       utils.SuccessResponse("List order success"),
+		Pagination: metadata,
+		Items:      items,
+	}, nil //.nil, nil
+}
+
+func (os *orderService) ListOrder(ctx context.Context, request *order.ListOrderRequest) (*order.ListOrderResponse, error) {
+	claims, err := jwtentity.GetClaimsFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	orders, metadata, err := os.orderRepository.GetListOrderPagination(ctx, request.Pagination, claims.Subject)
+	if err != nil {
+		return nil, err
+	}
+
+	items := make([]*order.ListOrderResponseItem, 0)
+	for _, orderEntity := range orders {
+
+		products := make([]*order.ListOrderResponseItemProduct, 0)
+
+		for _, oi := range orderEntity.Items {
+			products = append(products, &order.ListOrderResponseItemProduct{
+				Id:       oi.Id,
+				Name:     oi.ProductName,
+				Quantity: oi.Quantity,
+				Price:    oi.ProductPrice,
+			})
+		}
+
+		orderStatusCode := orderEntity.OrderStatusCode
+		if orderEntity.OrderStatusCode == entity.OrderStatusCodeUnpaid && time.Now().After(*orderEntity.ExpiredAt) {
+			orderEntity.OrderStatusCode = entity.OrderStatusCodeExpired
+		}
+
+		xenditInvoiceUrl := ""
+		if orderEntity.XenditInvoiceUrl != nil {
+			xenditInvoiceUrl = *orderEntity.XenditInvoiceUrl
+		}
+		items = append(items, &order.ListOrderResponseItem{
+			Id:               orderEntity.Id,
+			Number:           orderEntity.Number,
+			Customer:         orderEntity.UserFullName,
+			StatusCode:       orderStatusCode,
+			Total:            orderEntity.Total,
+			CreatedAt:        timestamppb.New(orderEntity.CreatedAt),
+			Products:         products,
+			XenditInvoiceUrl: xenditInvoiceUrl,
+		})
+	}
+
+	return &order.ListOrderResponse{
 		Base:       utils.SuccessResponse("List order success"),
 		Pagination: metadata,
 		Items:      items,
