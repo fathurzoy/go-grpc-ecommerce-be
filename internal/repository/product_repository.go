@@ -249,8 +249,21 @@ func (repo *productRepository) GetProductAdminPagination(ctx context.Context, pa
 }
 
 func (repo *productRepository) GetProductHighlight(ctx context.Context) ([]*entity.Product, error) {
+	query := `
+		SELECT id, name, description, price, image_file_name
+		FROM product
+		WHERE id IN (
+			SELECT p.id
+			FROM product p
+			JOIN order_item oi ON oi.product_id = p.id
+			WHERE p.is_deleted = false AND oi.is_deleted = false
+			GROUP BY p.id
+			ORDER BY COUNT(*) DESC
+			LIMIT 5
+		)
+	`
 
-	rows, err := repo.db.QueryContext(ctx, "SELECT id, name, description, price, image_file_name FROM product WHERE is_deleted = $1 ORDER BY created_at DESC LIMIT 5 ", false)
+	rows, err := repo.db.QueryContext(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -258,17 +271,21 @@ func (repo *productRepository) GetProductHighlight(ctx context.Context) ([]*enti
 
 	var products []*entity.Product
 	for rows.Next() {
-		var productEntity entity.Product
+		var product entity.Product
 		if err := rows.Scan(
-			&productEntity.Id,
-			&productEntity.Name,
-			&productEntity.Description,
-			&productEntity.Price,
-			&productEntity.ImageFileName,
+			&product.Id,
+			&product.Name,
+			&product.Description,
+			&product.Price,
+			&product.ImageFileName,
 		); err != nil {
 			return nil, err
 		}
-		products = append(products, &productEntity)
+		products = append(products, &product)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
 	}
 
 	return products, nil
