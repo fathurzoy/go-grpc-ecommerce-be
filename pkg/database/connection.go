@@ -15,6 +15,7 @@ func ConnectDB(ctx context.Context, connStr string) *sql.DB {
 	if err != nil {
 		panic(err)
 	}
+
 	log.Println("db connected")
 	err = db.PingContext(ctx)
 	if err != nil {

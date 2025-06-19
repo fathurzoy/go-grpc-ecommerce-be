@@ -2,7 +2,9 @@ package service
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
+	"runtime/debug"
 	"time"
 
 	"github.com/fathurzoy/go-grpc-ecommerce-be/internal/entity"
@@ -10,6 +12,7 @@ import (
 	"github.com/fathurzoy/go-grpc-ecommerce-be/internal/repository"
 	"github.com/fathurzoy/go-grpc-ecommerce-be/internal/utils"
 	"github.com/fathurzoy/go-grpc-ecommerce-be/pb/order"
+	"github.com/gofiber/fiber/v2/log"
 	"github.com/google/uuid"
 )
 
@@ -18,6 +21,7 @@ type IOrderService interface {
 }
 
 type orderService struct {
+	db                *sql.DB
 	orderRepository   repository.IOrderRepository
 	productRepository repository.IProductRepository
 }
@@ -28,7 +32,29 @@ func (os *orderService) CreateOrder(ctx context.Context, request *order.CreateOr
 		return nil, err
 	}
 
-	numbering, err := os.orderRepository.GetNumbering(ctx, "order")
+	tx, err := os.db.Begin()
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		if e := recover(); e != nil {
+			if tx != nil {
+				tx.Rollback()
+			}
+			debug.PrintStack()
+			panic(e)
+		}
+	}()
+	defer func() {
+		if err != nil && tx != nil {
+			tx.Rollback()
+		}
+	}()
+
+	orderRepo := os.orderRepository.WithTransaction(tx)
+	productRepo := os.productRepository.WithTransaction(tx)
+
+	numbering, err := orderRepo.GetNumbering(ctx, "order")
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +65,7 @@ func (os *orderService) CreateOrder(ctx context.Context, request *order.CreateOr
 	}
 
 	// cek apakah product ada
-	products, err := os.productRepository.GetProductsByIds(ctx, productIds)
+	products, err := productRepo.GetProductsByIds(ctx, productIds)
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +104,8 @@ func (os *orderService) CreateOrder(ctx context.Context, request *order.CreateOr
 		CreatedBy:       claims.FullName,
 	}
 
-	err = os.orderRepository.CreateOrder(ctx, &orderEntity)
+	log.Info("Order createdx")
+	err = orderRepo.CreateOrder(ctx, &orderEntity)
 	if err != nil {
 		return nil, err
 	}
@@ -98,14 +125,19 @@ func (os *orderService) CreateOrder(ctx context.Context, request *order.CreateOr
 			CreatedBy:            claims.FullName,
 		}
 
-		err = os.orderRepository.CreateOrderItem(ctx, &orderitem)
+		err = orderRepo.CreateOrderItem(ctx, &orderitem)
 		if err != nil {
 			return nil, err
 		}
 	}
 
 	numbering.Number++
-	err = os.orderRepository.UpdateNumbering(ctx, numbering)
+	err = orderRepo.UpdateNumbering(ctx, numbering)
+	if err != nil {
+		return nil, err
+	}
+
+	err = tx.Commit()
 	if err != nil {
 		return nil, err
 	}
@@ -116,8 +148,9 @@ func (os *orderService) CreateOrder(ctx context.Context, request *order.CreateOr
 	}, nil
 }
 
-func NewOrderService(orderRepository repository.IOrderRepository, productRepository repository.IProductRepository) IOrderService {
+func NewOrderService(db *sql.DB, orderRepository repository.IOrderRepository, productRepository repository.IProductRepository) IOrderService {
 	return &orderService{
+		db:                db,
 		orderRepository:   orderRepository,
 		productRepository: productRepository,
 	}
