@@ -199,12 +199,12 @@ func (ps *productService) DeleteProduct(ctx context.Context, request *product.De
 		return nil, err
 	}
 
-	imagePath := filepath.Join("storage", "product", productEntity.ImageFileName)
-	err = os.Remove(imagePath)
-	if err != nil {
-		log.Println(err)
-		// return nil, err
-	}
+	// imagePath := filepath.Join("storage", "product", productEntity.ImageFileName)
+	// err = os.Remove(imagePath)
+	// if err != nil {
+	// 	log.Println(err)
+	// 	// return nil, err
+	// }
 
 	// kirim response
 	return &product.DeleteProductResponse{
